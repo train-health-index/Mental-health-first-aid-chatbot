@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="MindAid Pro - A mental health first aid assistant">
+    <meta name="description" content="MindAid Pro - Your mental health first aid assistant">
     <meta name="author" content="MindAid Team">
-    <title>MindAid Pro - Mental Health First Aid Assistant</title>
+    <title>MindAid Pro - Mental Health First Aid</title>
     <!-- Boxicons CDN -->
     <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
     <!-- Poppins Font -->
@@ -1234,7 +1234,7 @@
 
                     <div class="feedback-form">
                         <textarea id="feedback-text" placeholder="Share your feedback or suggestions..." required aria-label="Feedback"></textarea>
-                        <button id="feedback-submit" aria-label="Submit Feedback">Submit Feedback</button>
+                        <button id="feedback-btn" aria-label="Submit Feedback">Submit Feedback</button>
                     </div>
                 </section>
             </div>
@@ -1472,28 +1472,6 @@
                 ],
             };
 
-            // DOM Elements
-            const elements = {
-                authContainer: document.getElementById("auth-container"),
-                mainApp: document.getElementById("main-app"),
-                loginForm: document.getElementById("login-form"),
-                registerForm: document.getElementById("register-form"),
-                toggleToRegister: document.getElementById("toggle-to-register"),
-                toggleToLogin: document.getElementById("toggle-to-login"),
-                logoutBtn: document.getElementById("logout-btn"),
-                languageSelector: document.getElementById("language-selector"),
-                chatContainer: document.getElementById("chat-messages"),
-                quickRepliesContainer: document.getElementById("quick-replies"),
-                userInput: document.getElementById("user-input"),
-                sendBtn: document.getElementById("send-btn"),
-                tabLinks: document.querySelectorAll(".nav-item"),
-                tabContents: document.querySelectorAll(".tab-content"),
-                moodButtons: document.querySelectorAll(".mood-btn"),
-                actionChecks: document.querySelectorAll(".action-check"),
-                feedbackSubmit: document.getElementById("feedback-submit"),
-                feedbackText: document.getElementById("feedback-text"),
-            };
-
             // Utility Functions
             const utils = {
                 formatTime: (date) =>
@@ -1540,6 +1518,28 @@
                     const typingIndicator = document.getElementById("typing-indicator");
                     if (typingIndicator) typingIndicator.remove();
                 },
+            };
+
+            // DOM Elements
+            const elements = {
+                authContainer: document.getElementById("auth-container"),
+                mainApp: document.getElementById("main-app"),
+                loginForm: document.getElementById("login-form"),
+                registerForm: document.getElementById("register-form"),
+                toggleToRegister: document.getElementById("toggle-to-register"),
+                toggleToLogin: document.getElementById("toggle-to-login"),
+                logoutBtn: document.getElementById("logout-btn"),
+                languageSelector: document.getElementById("language-selector"),
+                chatContainer: document.getElementById("chat-messages"),
+                quickRepliesContainer: document.getElementById("quick-replies"),
+                userInput: document.getElementById("user-input"),
+                sendBtn: document.getElementById("send-btn"),
+                tabLinks: document.querySelectorAll(".nav-item"),
+                tabContents: document.querySelectorAll(".tab-content"),
+                moodButtons: document.querySelectorAll(".mood-btn"),
+                actionChecks: document.querySelectorAll(".action-check"),
+                feedbackBtn: document.getElementById("feedback-btn"),
+                feedbackText: document.getElementById("feedback-text"),
             };
 
             // Authentication
@@ -1799,20 +1799,90 @@
                         document.getElementById(`${link.getAttribute("data-tab")}-tab`).classList.add("active");
                     });
                 });
-        
 
-            // Initial bot messages
-            setTimeout(() => {
-                const typingIndicator = showTyping();
-                setTimeout(() => {
-                    hideTyping();
-                    addMessage(languageData[currentLanguage].initialMessages[0]);
-                    setTimeout(() => {
-                        addMessage(languageData[currentLanguage].initialMessages[1]);
-                    }, 800);
-                }, 1500);
-            }, 1000);
-        });
-    </script>
+                elements.moodButtons.forEach((btn) => {
+                    btn.addEventListener("click", () => {
+                        elements.moodButtons.forEach((b) => b.classList.remove("selected"));
+                        btn.classList.add("selected");
+
+                        const mood = btn.getAttribute("data-mood");
+                        const moodValues ={
+    excellent: 5,
+    good: 4,
+    neutral: 3,
+    poor: 2,
+    terrible: 1,
+};
+const moodValue = moodValues[mood];
+const today = new Date().toISOString().split("T")[0];
+
+if (!state.moodData[state.currentUser]) {
+    state.moodData[state.currentUser] = [];
+}
+
+const existingMood = state.moodData[state.currentUser].find((entry) => entry.date === today);
+if (existingMood) {
+    existingMood.value = moodValue;
+} else {
+    state.moodData[state.currentUser].push({ date: today, value: moodValue });
+}
+
+localStorage.setItem("moodData", JSON.stringify(state.moodData));
+state.moodChart.destroy();
+app.initializeMoodChart();
+utils.triggerConfetti();
+alert("Mood logged successfully! Keep tracking your progress. 🌟");
+});
+});
+
+elements.actionChecks.forEach((check) => {
+    check.addEventListener("click", () => {
+        check.classList.toggle("checked");
+        if (check.classList.contains("checked")) {
+            utils.triggerConfetti();
+            const emojiContainer = check.closest(".action-item");
+            utils.triggerEmojiBurst(emojiContainer, ["🎉", "✅", "🌟"]);
+        }
+    });
+});
+
+elements.feedbackBtn.addEventListener("click", () => {
+    const feedback = elements.feedbackText.value.trim();
+    if (!feedback) {
+        alert("Please provide your feedback before submitting.");
+        return;
+    }
+    alert("Thank you for your feedback! We’ll use it to improve MindAid Pro. 💬");
+    elements.feedbackText.value = "";
+    utils.triggerConfetti();
+});
+
+elements.sendBtn.addEventListener("click", () => {
+    const userMessage = elements.userInput.value.trim();
+    if (!userMessage) return;
+    utils.addMessage(userMessage, true);
+    elements.userInput.value = "";
+    const typingIndicator = utils.showTyping();
+    chat.generateResponse(userMessage);
+    utils.triggerEmojiBurst(elements.chatContainer, ["😊", "🌟", "💖"]);
+});
+
+elements.userInput.addEventListener("keypress", (e) => {
+    if (e.key === "Enter") {
+        elements.sendBtn.click();
+    }
+});
+};
+
+// Initialize
+const init = () => {
+    elements.languageSelector.value = state.currentLanguage;
+    auth.initialize();
+    app.updateChatLanguage();
+    setupEventListeners();
+};
+
+init();
+})();</script>
 </body>
 </html>
