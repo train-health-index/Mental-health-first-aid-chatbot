@@ -4,153 +4,184 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MindAid Pro - Mental Health First Aid Assistant</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.1/css/all.min.css">
+    <!-- Boxicons CDN for new icons -->
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <!-- Poppins Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Confetti.js for fun effects -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <style>
         :root {
-            --primary: #4a6bff;
-            --primary-dark: #2a3cb0;
-            --secondary-color: #6c757d;
-            --success: #28a745;
-            --info: #17a2b8;
-            --container-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            --primary: #ff6f91;
+            --primary-dark: #e05577;
+            --secondary: #a29bfe;
+            --secondary-dark: #7f7bff;
+            --accent: #feca57;
+            --background: #f4e7ff;
+            --card-bg: rgba(255, 255, 255, 0.2);
+            --text: #2d3436;
+            --success: #55efc4;
+            --info: #74c0fc;
+            --container-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
             --transition: all 0.3s ease;
         }
-        
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', 'Roboto', sans-serif;
+            font-family: 'Poppins', sans-serif;
         }
-        
+
         body {
-            background: linear-gradient(135deg, #f0f4f8 0%, #dfe6ff 100%);
+            background: linear-gradient(135deg, #f4e7ff 0%, #ffdeeb 100%);
             min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
             padding: 20px;
-            color: #333;
+            color: var(--text);
             line-height: 1.6;
+            overflow-x: hidden;
         }
-        
+
         .container {
             width: 100%;
             max-width: 1200px;
-            background: white;
-            border-radius: 12px;
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
             box-shadow: var(--container-shadow);
+            border: 1px solid rgba(255, 255, 255, 0.3);
             overflow: hidden;
             display: flex;
             flex-direction: column;
             height: 95vh;
         }
-        
+
         .auth-container {
             width: 100%;
             max-width: 400px;
-            background: white;
-            border-radius: 12px;
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
             box-shadow: var(--container-shadow);
             padding: 40px;
             text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.3);
         }
-        
+
         .auth-title {
             font-size: 1.8rem;
-            color: #333;
+            color: var(--text);
             margin-bottom: 20px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
-        
+
         .auth-form {
             display: flex;
             flex-direction: column;
             gap: 15px;
         }
-        
+
         .auth-form input {
             padding: 12px;
-            border: 1px solid #ddd;
-            border-radius: 6px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
             font-size: 1rem;
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text);
         }
-        
+
         .auth-form button {
             background: var(--primary);
             color: white;
             border: none;
             padding: 12px;
-            border-radius: 6px;
+            border-radius: 10px;
             cursor: pointer;
             font-size: 1rem;
             transition: var(--transition);
+            box-shadow: 0 4px 15px rgba(255, 111, 145, 0.3);
         }
-        
+
         .auth-form button:hover {
             background: var(--primary-dark);
+            transform: scale(1.05);
         }
-        
+
         .auth-toggle {
-            color: var(--primary);
+            color: var(--secondary);
             cursor: pointer;
             margin-top: 10px;
+            transition: var(--transition);
         }
-        
+
+        .auth-toggle:hover {
+            color: var(--secondary-dark);
+        }
+
         .motivational {
-            background: linear-gradient(45deg, var(--success) 0%, #20c997 100%);
+            background: linear-gradient(45deg, var(--success) 0%, #00b894 100%);
             color: white;
             padding: 15px;
-            border-radius: 10px;
+            border-radius: 12px;
             margin-bottom: 20px;
             text-align: center;
             font-style: italic;
             font-size: 1.1rem;
+            box-shadow: 0 4px 15px rgba(85, 239, 196, 0.3);
         }
-        
+
         header {
-            background: linear-gradient(90deg, var(--primary) 0%, var(--primary-dark) 100%);
+            background: linear-gradient(90deg, var(--primary) 0%, var(--secondary) 100%);
             color: white;
             padding: 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
-        
+
         .logo {
             display: flex;
             align-items: center;
             gap: 15px;
         }
-        
+
         .logo-icon {
-            background: rgba(255,255,255,0.2);
+            background: rgba(255, 255, 255, 0.2);
             width: 40px;
             height: 40px;
-            border-radius: 10px;
+            border-radius: 12px;
             display: flex;
             justify-content: center;
             align-items: center;
             font-size: 20px;
         }
-        
+
+        .logo-icon i {
+            display: inline-block !important;
+            visibility: visible !important;
+        }
+
         .logo-text h1 {
             font-size: 1.6rem;
-            font-weight: bold;
+            font-weight: 600;
             margin-bottom: 2px;
         }
-        
+
         .logo-text .subtitle {
             font-size: 0.85rem;
-            opacity: 0.7;
+            opacity: 0.8;
         }
-        
+
         .user-controls {
             display: flex;
             gap: 10px;
             align-items: center;
         }
-        
+
         .user-btn {
             background: rgba(255, 255, 255, 0.2);
             color: white;
@@ -163,97 +194,109 @@
             align-items: center;
             cursor: pointer;
             transition: var(--transition);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
         }
-        
+
         .user-btn:hover {
             background: rgba(255, 255, 255, 0.3);
             transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
         }
-        
+
+        .user-btn i {
+            display: inline-block !important;
+            visibility: visible !important;
+        }
+
         .language-selector {
-            background: rgba(255,255,255,0.2);
+            background: rgba(255, 255, 255, 0.2);
             color: white;
             border: none;
             padding: 8px 12px;
-            border-radius: 6px;
+            border-radius: 8px;
             cursor: pointer;
             font-size: 0.9rem;
+            transition: var(--transition);
         }
-        
+
         .language-selector:focus {
             outline: none;
-            background: rgba(255,255,255,0.3);
+            background: rgba(255, 255, 255, 0.3);
         }
-        
+
         .app-body {
             display: flex;
             flex: 1;
             overflow: hidden;
         }
-        
+
         .sidebar {
             width: 240px;
-            background: #f8f9fa;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
             border-right: none;
             display: flex;
             flex-direction: column;
             padding: 20px 0;
         }
-        
+
         .nav-item {
             display: flex;
             align-items: center;
             padding: 12px 20px;
-            color: #333;
+            color: var(--text);
             text-decoration: none;
             font-weight: 500;
             transition: var(--transition);
-            border-left: 3px solid transparent;
+            border-left: 4px solid transparent;
         }
-        
+
         .nav-item i {
             margin-right: 10px;
             width: 20px;
             text-align: center;
-            font-size: 18px;
-            color: var(--secondary-color);
+            font-size: 20px;
+            color: var(--secondary);
+            display: inline-block !important;
+            visibility: visible !important;
         }
-        
+
         .nav-item.active {
-            background: rgba(78,115,223,0.1);
-            color: var(--primary);
-            border-left: 3px solid var(--primary);
+            background: rgba(162, 155, 254, 0.2);
+            color: var(--secondary-dark);
+            border-left: 4px solid var(--secondary-dark);
         }
-        
+
         .nav-item:hover {
-            background-color: rgba(78, 115, 223, 0.5);
-            color: var(--primary);
+            background: rgba(162, 155, 254, 0.3);
+            color: var(--secondary-dark);
         }
-        
+
         .main-content {
             flex: 1;
             display: flex;
             flex-direction: column;
             overflow: hidden;
         }
-        
+
         .tab-content {
             flex: 1;
             overflow-y: auto;
             padding: 20px;
             display: none;
         }
-        
+
         .tab-content.active {
             display: block;
         }
-        
+
         .chat-container {
             height: 100%;
             display: flex;
             flex-direction: column;
+            position: relative;
         }
-        
+
         .chat-messages {
             flex: 1;
             overflow-y: auto;
@@ -261,259 +304,280 @@
             display: flex;
             flex-direction: column;
         }
-        
+
         .message {
             max-width: 75%;
             padding: 12px 18px;
             margin-bottom: 15px;
             border-radius: 15px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
             line-height: 1.5;
             animation: fadeIn 0.3s ease;
+            background: rgba(255, 255, 255, 0.3);
+            backdrop-filter: blur(5px);
         }
-        
+
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(8px); }
             to { opacity: 1; transform: translateY(0); }
         }
-        
+
         .bot-message {
-            background: #f9f9f9;
-            border: 1px solid #e9ecef;
+            background: rgba(162, 155, 254, 0.2);
+            border: 1px solid rgba(162, 155, 254, 0.3);
             border-bottom-left-radius: 4px;
             align-self: flex-start;
         }
-        
+
         .user-message {
-            background: var(--primary);
-            color: white;
+            background: rgba(255, 111, 145, 0.2);
+            color: var(--text);
             border-bottom-right-radius: 4px;
             align-self: flex-end;
         }
-        
+
         .message-time {
             font-size: 0.7rem;
             opacity: 0.6;
             margin-top: 6px;
             display: block;
         }
-        
+
         .typing-indicator {
             display: inline-flex;
             padding: 12px 18px;
-            background: #f9f9f9;
+            background: rgba(162, 155, 254, 0.2);
             border-radius: 15px;
             border-bottom-left-radius: 4px;
             align-self: flex-start;
-            border: 1px solid #e9ecef;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border: 1px solid rgba(162, 155, 254, 0.3);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         }
-        
+
         .typing-dot {
             width: 8px;
             height: 8px;
-            background: var(--secondary-color);
+            background: var(--secondary);
             border-radius: 50%;
             margin: 0 3px;
             animation: typing 1.2s infinite;
         }
-        
+
         .typing-dot:nth-child(2) { animation-delay: 0.2s; }
         .typing-dot:nth-child(3) { animation-delay: 0.4s; }
-        
+
         @keyframes typing {
             0%, 60%, 100% { transform: translateY(0); }
             30% { transform: translateY(-4px); }
         }
-        
+
         .crisis-alert {
-            background: linear-gradient(90deg, #dc3545 0%, #c82333 100%);
+            background: linear-gradient(90deg, #ff7675 0%, #d63031 100%);
             color: white;
-            border-radius: 10px;
-            padding: 10px;
+            border-radius: 12px;
+            padding: 15px;
             margin: 15px 0;
-            box-shadow: 0 4px 10px rgba(220,53,69,0.2);
+            box-shadow: 0 4px 15px rgba(255, 118, 117, 0.3);
         }
-        
+
         .resources-card {
             background: var(--info);
             color: white;
-            border-radius: 10px;
+            border-radius: 12px;
             padding: 15px;
             margin: 15px 0;
-            box-shadow: 0px 4px 10px rgba(23,162,184,0);
+            box-shadow: 0 4px 12px rgba(116, 192, 252, 0.3);
         }
-        
+
         .input-container {
             padding: 15px;
-            background: white;
-            border-top: 1px solid #e9ecef;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
             display: flex;
             gap: 10px;
-            box-shadow: 0 -4px 10px rgba(0,0,0,0);
+            box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.05);
         }
-        
+
         #user-input {
             flex: 1;
             padding: 12px 18px;
-            border: 1px solid #ddd;
-            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 12px;
             outline: none;
             font-size: 0.9rem;
             transition: var(--transition);
-            background: none;
-            background-color: #f8f9f9;
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text);
         }
-        
+
         #user-input:focus {
-            border-color: var(--primary);
-            background: none;
-            box-shadow: 0 0 0 3px rgba(white);
+            border-color: var(--secondary);
+            box-shadow: 0 0 0 3px rgba(162, 155, 254, 0.2);
         }
-        
+
         .chat-btn {
             background: var(--primary);
             color: white;
             border: none;
             border-radius: 50%;
-            width: 44px;
+            width: 45px;
             height: 45px;
             display: flex;
             justify-content: center;
             align-items: center;
             cursor: pointer;
             transition: var(--transition);
-            font-size: 14px;
-            box-shadow: 0 3px 8px rgba(0,0,0,0.3);
+            font-size: 16px;
+            box-shadow: 0 4px 15px rgba(255, 111, 145, 0.3);
         }
-        
+
         .chat-btn:hover {
             background: var(--primary-dark);
             transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 111, 145, 0.4);
         }
-        
+
+        .chat-btn i {
+            display: inline-block !important;
+            visibility: visible !important;
+        }
+
         .quick-replies {
             display: flex;
             flex-wrap: wrap;
             gap: 10px;
             margin-top: 10px;
         }
-        
+
         .quick-reply {
-            background-color: rgba(0,255,0,0.1);
+            background: rgba(255, 111, 145, 0.1);
             color: var(--primary);
-            border: 1px solid rgba(0,0,0,0.2);
-            border-radius: 10px;
+            border: 1px solid rgba(255, 111, 145, 0.3);
+            border-radius: 12px;
             padding: 8px 12px;
             cursor: pointer;
-            font-size: px;
+            font-size: 0.9rem;
             transition: var(--transition);
         }
-        
+
         .quick-reply:hover {
             background: var(--primary);
             color: white;
             transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(255, 111, 145, 0.3);
         }
-        
+
         .tab-title {
             font-size: 1.6rem;
-            color: #333;
+            color: var(--text);
             margin-bottom: 20px;
             display: flex;
             align-items: center;
             gap: 10px;
         }
-        
+
         .tab-title i {
-            background: var(--primary);
+            background: var(--secondary);
             color: white;
             width: 40px;
             height: 40px;
-            border-radius: 10px;
+            border-radius: 12px;
             display: flex;
             justify-content: center;
             align-items: center;
             font-size: 20px;
+            display: inline-block !important;
+            visibility: visible !important;
         }
-        
+
         .card-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
             gap: 20px;
             margin-top: 15px;
         }
-        
+
         .card {
-            background: white;
-            border-radius: 10px;
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
             overflow: hidden;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            box-shadow: var(--container-shadow);
+            border: 1px solid rgba(255, 255, 255, 0.3);
             transition: var(--transition);
         }
-        
+
         .card:hover {
             transform: translateY(-4px);
-            box-shadow: 0 6px 16px rgba(0,0,0,0.15);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
         }
-        
+
         .card-header {
             padding: 15px;
-            background: #f8f9fa;
+            background: rgba(255, 255, 255, 0.2);
             font-weight: 600;
-            color: #333;
+            color: var(--text);
             display: flex;
             align-items: center;
             gap: 10px;
         }
-        
+
         .card-header i {
             color: var(--primary);
             font-size: 18px;
+            display: inline-block !important;
+            visibility: visible !important;
         }
-        
+
         .card-body {
             padding: 15px;
         }
-        
+
         .resource-item {
             display: flex;
             gap: 12px;
             padding: 12px 0;
-            border-bottom: 1px solid #f0f2f5;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
         }
-        
+
         .resource-item:last-child {
             border-bottom: none;
         }
-        
+
         .resource-icon {
-            background: rgba(40,167,69,0.1);
+            background: rgba(85, 239, 196, 0.2);
             color: var(--success);
             width: 40px;
             height: 40px;
-            border-radius: 10px;
+            border-radius: 12px;
             display: flex;
             justify-content: center;
             align-items: center;
             font-size: 16px;
             flex-shrink: 0;
         }
-        
+
+        .resource-icon i {
+            display: inline-block !important;
+            visibility: visible !important;
+        }
+
         .resource-content h3 {
             font-size: 1rem;
             margin-bottom: 4px;
-            color: #333;
+            color: var(--text);
         }
-        
+
         .resource-content p {
             font-size: 0.9rem;
-            color: var(--secondary-color);
+            color: var(--text);
+            opacity: 0.8;
             margin-bottom: 6px;
         }
-        
+
         .resource-content a {
-            color: var(--primary);
+            color: var(--secondary);
             text-decoration: none;
             font-weight: 500;
             font-size: 0.9rem;
@@ -521,95 +585,115 @@
             align-items: center;
             gap: 5px;
         }
-        
+
         .resource-content a:hover {
             text-decoration: underline;
         }
-        
+
+        .resource-content a i {
+            display: inline-block !important;
+            visibility: visible !important;
+        }
+
         .chart-container {
-            background: white;
-            border-radius: 10px;
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
             padding: 20px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            box-shadow: var(--container-shadow);
             margin-top: 15px;
             height: 320px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
         }
-        
+
         .mood-selector {
             display: flex;
             gap: 12px;
             margin-bottom: 20px;
         }
-        
+
         .mood-btn {
             flex: 1;
-            background: white;
-            border: 1px solid #e9ecef;
-            border-radius: 10px;
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 12px;
             padding: 15px;
             text-align: center;
             cursor: pointer;
             transition: var(--transition);
             font-weight: 500;
         }
-        
+
         .mood-btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
         }
-        
+
         .mood-btn.selected {
-            border-color: var(--primary);
-            background: rgba(78,115,223,0.05);
-            box-shadow: 0 4px 12px rgba(78,115,223,0.15);
+            border-color: var(--secondary);
+            background: rgba(162, 155, 254, 0.2);
+            box-shadow: 0 4px 15px rgba(162, 155, 254, 0.3);
         }
-        
+
         .mood-btn i {
             font-size: 28px;
             margin-bottom: 10px;
             display: block;
+            display: inline-block !important;
+            visibility: visible !important;
         }
-        
+
         .mood-btn span {
             display: block;
             font-size: 0.85rem;
-            color: var(--secondary-color);
+            color: var(--text);
+            opacity: 0.8;
             margin-top: 6px;
         }
-        
+
         .action-plan {
-            background: white;
-            border-radius: 10px;
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
             padding: 20px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            box-shadow: var(--container-shadow);
             margin-top: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
         }
-        
+
         .action-plan h3 {
             margin-bottom: 15px;
             padding-bottom: 10px;
-            border-bottom: 1px solid #f0f2f5;
-            color: #333;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            color: var(--text);
             display: flex;
             align-items: center;
             gap: 10px;
         }
-        
+
+        .action-plan h3 i {
+            color: var(--primary);
+            font-size: 18px;
+            display: inline-block !important;
+            visibility: visible !important;
+        }
+
         .action-item {
             display: flex;
             gap: 12px;
             padding: 12px 0;
-            border-bottom: 1px solid #f0f2f5;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
         }
-        
+
         .action-item:last-child {
             border-bottom: none;
         }
-        
+
         .action-check {
             width: 20px;
             height: 20px;
-            border: 2px solid #e9ecef;
+            border: 2px solid rgba(255, 255, 255, 0.3);
             border-radius: 5px;
             display: flex;
             justify-content: center;
@@ -618,112 +702,158 @@
             transition: var(--transition);
             cursor: pointer;
         }
-        
+
         .action-check.checked {
             background: var(--success);
             border-color: var(--success);
             color: white;
         }
-        
+
+        .action-check i {
+            display: inline-block !important;
+            visibility: visible !important;
+        }
+
         .action-text {
             flex: 1;
         }
-        
+
         .action-text h4 {
             margin-bottom: 4px;
-            color: #333;
+            color: var(--text);
         }
-        
+
         .action-text p {
-            color: var(--secondary-color);
+            color: var(--text);
+            opacity: 0.8;
             font-size: 0.9rem;
         }
-        
+
         .feedback-form {
             max-width: 500px;
             margin: 0 auto;
         }
-        
+
         .feedback-form textarea {
             width: 100%;
             min-height: 120px;
             padding: 12px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 12px;
             resize: vertical;
             margin-bottom: 12px;
             font-size: 0.9rem;
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text);
         }
-        
+
         .feedback-form button {
             background: var(--primary);
             color: white;
             border: none;
             padding: 10px 20px;
-            border-radius: 8px;
+            border-radius: 12px;
             cursor: pointer;
             font-size: 0.9rem;
             transition: var(--transition);
+            box-shadow: 0 4px 15px rgba(255, 111, 145, 0.3);
         }
-        
+
         .feedback-form button:hover {
             background: var(--primary-dark);
             transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 111, 145, 0.4);
         }
-        
+
         footer {
             text-align: center;
             padding: 15px;
             font-size: 0.8rem;
-            color: var(--secondary-color);
-            background: #f8f9fa;
-            border-top: 1px solid #e9ecef;
+            color: var(--text);
+            opacity: 0.8;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
         }
-        
+
         .disclaimer {
-            background: rgba(220,53,69,0.05);
-            border: 1px solid rgba(220,53,69,0.15);
-            border-radius: 10px;
+            background: rgba(255, 118, 117, 0.1);
+            border: 1px solid rgba(255, 118, 117, 0.2);
+            border-radius: 12px;
             padding: 12px;
             margin-top: 15px;
             font-size: 0.85rem;
-            color: var(--secondary-color);
+            color: var(--text);
+            opacity: 0.8;
         }
-        
+
+        .emoji-burst {
+            position: absolute;
+            font-size: 20px;
+            animation: emojiPop 1s ease forwards;
+        }
+
+        @keyframes emojiPop {
+            0% { transform: scale(0); opacity: 0; }
+            50% { transform: scale(1.5); opacity: 1; }
+            100% { transform: scale(1); opacity: 0; }
+        }
+
+        .mascot {
+            position: absolute;
+            bottom: 80px;
+            left: 20px;
+            width: 60px;
+            height: 60px;
+            background: url('https://img.icons8.com/emoji/48/000000/smiling-face-with-heart-eyes.png') no-repeat center;
+            background-size: contain;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
         @media (max-width: 768px) {
             .container, .auth-container {
                 height: 100vh;
                 border-radius: 0;
             }
-            
+
             .sidebar {
                 width: 60px;
             }
-            
+
             .nav-item span {
                 display: none;
             }
-            
+
             .nav-item i {
                 margin-right: 0;
-                font-size: 20px;
+                font-size: 22px;
             }
-            
+
             .message {
                 max-width: 85%;
             }
-            
+
             .card-grid {
                 grid-template-columns: 1fr;
             }
-            
+
             .mood-selector {
                 flex-direction: column;
             }
-            
+
             .language-selector {
                 font-size: 0.8rem;
                 padding: 6px 8px;
+            }
+
+            .mascot {
+                width: 40px;
+                height: 40px;
             }
         }
     </style>
@@ -750,7 +880,7 @@
         <header>
             <div class="logo">
                 <div class="logo-icon">
-                    <i class="fas fa-heart"></i>
+                    <i class='bx bx-heart'></i>
                 </div>
                 <div class="logo-text">
                     <h1>MindAid Pro</h1>
@@ -764,282 +894,280 @@
                     <option value="tanglish">Tanglish</option>
                 </select>
                 <button class="user-btn" title="Notifications">
-                    <i class="fas fa-bell"></i>
+                    <i class='bx bx-bell'></i>
                 </button>
                 <button class="user-btn" title="Settings">
-                    <i class="fas fa-cog"></i>
+                    <i class='bx bx-cog'></i>
                 </button>
                 <button class="user-btn" title="User Profile">
-                    <i class="fas fa-user"></i>
+                    <i class='bx bx-user'></i>
                 </button>
                 <button class="user-btn" id="logout-btn" title="Logout">
-                    <i class="fas fa-sign-out-alt"></i>
+                    <i class='bx bx-log-out'></i>
                 </button>
             </div>
         </header>
-        
+
         <div class="app-body">
             <div class="sidebar">
                 <a href="#" class="nav-item active" data-tab="chat">
-                    <i class="fas fa-comment-dots"></i>
+                    <i class='bx bx-message-dots'></i>
                     <span>Chat Support</span>
                 </a>
                 <a href="#" class="nav-item" data-tab="mood">
-                    <i class="fas fa-chart-line"></i>
+                    <i class='bx bx-line-chart'></i>
                     <span>Mood Tracker</span>
                 </a>
                 <a href="#" class="nav-item" data-tab="resources">
-                    <i class="fas fa-book-medical"></i>
+                    <i class='bx bx-book'></i>
                     <span>Resources</span>
                 </a>
                 <a href="#" class="nav-item" data-tab="plan">
-                    <i class="fas fa-tasks"></i>
+                    <i class='bx bx-task'></i>
                     <span>Action Plan</span>
                 </a>
                 <a href="#" class="nav-item" data-tab="emergency">
-                    <i class="fas fa-life-ring"></i>
+                    <i class='bx bx-shield'></i>
                     <span>Emergency</span>
                 </a>
                 <a href="#" class="nav-item" data-tab="feedback">
-                    <i class="fas fa-comment"></i>
+                    <i class='bx bx-comment'></i>
                     <span>Feedback</span>
                 </a>
             </div>
-            
+
             <div class="main-content">
                 <!-- Chat Support Tab -->
                 <div class="tab-content active" id="chat-tab">
-                    <h2 class="tab-title"><i class="fas fa-comment-dots"></i> Mental Health Support</h2>
-                    <div class="motivational">"You are stronger than you know, and every step counts!"</div>
+                    <h2 class="tab-title"><i class='bx bx-message-dots'></i> Mental Health Support</h2>
+                    <div class="motivational">"You are stronger than you know, and every step counts! 🌟"</div>
                     <p>Chat with MindAid to get immediate support, coping strategies, and resources tailored to your needs.</p>
-                    
+
                     <div class="chat-container">
                         <div class="chat-messages" id="chat-messages">
                             <div class="message bot-message" id="initial-message">
-                                <!-- Language-specific message set in JS -->
-                                <span class="message-time">Today, 01:09 AM</span>
+                                <span class="message-time">Today, 01:04 PM</span>
                             </div>
                             <div class="quick-replies" id="quick-replies">
-                                <!-- Language-specific quick replies set in JS -->
                             </div>
                         </div>
-                        
+                        <div class="mascot"></div>
                         <div class="input-container">
                             <input type="text" id="user-input" placeholder="Type your message here..." autocomplete="off">
                             <button class="chat-btn" id="send-btn">
-                                <i class="fas fa-paper-plane"></i>
+                                <i class='bx bx-send'></i>
                             </button>
                         </div>
                     </div>
                 </div>
-                
+
                 <!-- Mood Tracker Tab -->
                 <div class="tab-content" id="mood-tab">
-                    <h2 class="tab-title"><i class="fas fa-chart-line"></i> Mood Tracker</h2>
-                    <div class="motivational">"Every day is a new opportunity to nurture your inner peace!"</div>
+                    <h2 class="tab-title"><i class='bx bx-line-chart'></i> Mood Tracker</h2>
+                    <div class="motivational">"Every day is a new opportunity to nurture your inner peace! 🌈"</div>
                     <p>Track your emotional well-being over time to identify patterns and triggers.</p>
-                    
+
                     <div class="mood-selector">
                         <div class="mood-btn" data-mood="excellent">
-                            <i class="fas fa-laugh-beam"></i>
+                            <i class='bx bx-happy-alt'></i>
                             Excellent
                             <span>Feeling great!</span>
                         </div>
                         <div class="mood-btn" data-mood="good">
-                            <i class="fas fa-smile"></i>
+                            <i class='bx bx-smile'></i>
                             Good
                             <span>Pretty good day</span>
                         </div>
                         <div class="mood-btn" data-mood="neutral">
-                            <i class="fas fa-meh"></i>
+                            <i class='bx bx-meh'></i>
                             Neutral
                             <span>Just okay</span>
                         </div>
                         <div class="mood-btn" data-mood="poor">
-                            <i class="fas fa-frown"></i>
+                            <i class='bx bx-sad'></i>
                             Poor
                             <span>Not feeling great</span>
                         </div>
                         <div class="mood-btn" data-mood="terrible">
-                            <i class="fas fa-sad-tear"></i>
+                            <i class='bx bx-sad'></i>
                             Terrible
                             <span>Really struggling</span>
                         </div>
                     </div>
-                    
+
                     <div class="chart-container">
                         <canvas id="mood-chart"></canvas>
                     </div>
                 </div>
-                
+
                 <!-- Resources Tab -->
                 <div class="tab-content" id="resources-tab">
-                    <h2 class="tab-title"><i class="fas fa-book-medical"></i> Mental Health Resources</h2>
-                    <div class="motivational">"You are never alone in your journey!"</div>
+                    <h2 class="tab-title"><i class='bx bx-book'></i> Mental Health Resources</h2>
+                    <div class="motivational">"You are never alone in your journey! 🤝"</div>
                     <p>Access curated resources, tools, and professional support options.</p>
-                    
+
                     <div class="card-grid">
                         <div class="card">
                             <div class="card-header">
-                                <i class="fas fa-hands-helping"></i>
+                                <i class='bx bx-support'></i>
                                 Crisis Support
                             </div>
                             <div class="card-body">
                                 <div class="resource-item">
                                     <div class="resource-icon">
-                                        <i class="fas fa-phone-alt"></i>
+                                        <i class='bx bx-phone'></i>
                                     </div>
                                     <div class="resource-content">
                                         <h3>Vandrevala Foundation</h3>
                                         <p>24/7 mental health helpline</p>
-                                        <a href="#">Call 9999666555 <i class="fas fa-arrow-right"></i></a>
+                                        <a href="#">Call 9999666555 <i class='bx bx-right-arrow-alt'></i></a>
                                     </div>
                                 </div>
                                 <div class="resource-item">
                                     <div class="resource-icon">
-                                        <i class="fas fa-sms"></i>
+                                        <i class='bx bx-message'></i>
                                     </div>
                                     <div class="resource-content">
                                         <h3>AASRA Suicide Prevention</h3>
                                         <p>24/7 crisis support</p>
-                                        <a href="#">Call +91-9820466726 <i class="fas fa-arrow-right"></i></a>
+                                        <a href="#">Call +91-9820466726 <i class='bx bx-right-arrow-alt'></i></a>
                                     </div>
                                 </div>
                                 <div class="resource-item">
                                     <div class="resource-icon">
-                                        <i class="fas fa-globe"></i>
+                                        <i class='bx bx-globe'></i>
                                     </div>
                                     <div class="resource-content">
                                         <h3>iCall Helpline</h3>
                                         <p>Psychological support by TISS</p>
-                                        <a href="#">Call +91-9152987821 <i class="fas fa-arrow-right"></i></a>
+                                        <a href="#">Call +91-9152987821 <i class='bx bx-right-arrow-alt'></i></a>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        
+
                         <div class="card">
                             <div class="card-header">
-                                <i class="fas fa-book"></i>
+                                <i class='bx bx-book-open'></i>
                                 Self-Help Resources
                             </div>
                             <div class="card-body">
                                 <div class="resource-item">
                                     <div class="resource-icon">
-                                        <i class="fas fa-file-alt"></i>
+                                        <i class='bx bx-file'></i>
                                     </div>
                                     <div class="resource-content">
                                         <h3>CBT Thought Diary</h3>
                                         <p>Track thoughts and challenge cognitive distortions</p>
-                                        <a href="#">Download Template <i class="fas fa-arrow-right"></i></a>
+                                        <a href="#">Download Template <i class='bx bx-right-arrow-alt'></i></a>
                                     </div>
                                 </div>
                                 <div class="resource-item">
                                     <div class="resource-icon">
-                                        <i class="fas fa-headphones"></i>
+                                        <i class='bx bx-headphone'></i>
                                     </div>
                                     <div class="resource-content">
                                         <h3>Guided Meditations</h3>
                                         <p>Mindfulness and relaxation exercises</p>
-                                        <a href="#">Listen Now <i class="fas fa-arrow-right"></i></a>
+                                        <a href="#">Listen Now <i class='bx bx-right-arrow-alt'></i></a>
                                     </div>
                                 </div>
                                 <div class="resource-item">
                                     <div class="resource-icon">
-                                        <i class="fas fa-video"></i>
+                                        <i class='bx bx-video'></i>
                                     </div>
                                     <div class="resource-content">
                                         <h3>Mental Health Webinars</h3>
                                         <p>Free educational sessions from experts</p>
-                                        <a href="#">View Schedule <i class="fas fa-arrow-right"></i></a>
+                                        <a href="#">View Schedule <i class='bx bx-right-arrow-alt'></i></a>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        
+
                         <div class="card">
                             <div class="card-header">
-                                <i class="fas fa-user-md"></i>
+                                <i class='bx bx-health'></i>
                                 Professional Help
                             </div>
                             <div class="card-body">
                                 <div class="resource-item">
                                     <div class="resource-icon">
-                                        <i class="fas fa-search"></i>
+                                        <i class='bx bx-search'></i>
                                     </div>
                                     <div class="resource-content">
                                         <h3>Therapist Directory</h3>
                                         <p>Find licensed professionals near you</p>
-                                        <a href="#">Search Now <i class="fas fa-arrow-right"></i></a>
+                                        <a href="#">Search Now <i class='bx bx-right-arrow-alt'></i></a>
                                     </div>
                                 </div>
                                 <div class="resource-item">
                                     <div class="resource-icon">
-                                        <i class="fas fa-laptop"></i>
+                                        <i class='bx bx-laptop'></i>
                                     </div>
                                     <div class="resource-content">
                                         <h3>Online Therapy</h3>
                                         <p>Connect with therapists remotely</p>
-                                        <a href="#">Get Started <i class="fas fa-arrow-right"></i></a>
+                                        <a href="#">Get Started <i class='bx bx-right-arrow-alt'></i></a>
                                     </div>
                                 </div>
                                 <div class="resource-item">
                                     <div class="resource-icon">
-                                        <i class="fas fa-users"></i>
+                                        <i class='bx bx-group'></i>
                                     </div>
                                     <div class="resource-content">
                                         <h3>Support Groups</h3>
                                         <p>Connect with others facing similar challenges</p>
-                                        <a href="#">Find Groups <i class="fas fa-arrow-right"></i></a>
+                                        <a href="#">Find Groups <i class='bx bx-right-arrow-alt'></i></a>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-                
+
                 <!-- Action Plan Tab -->
                 <div class="tab-content" id="plan-tab">
-                    <h2 class="tab-title"><i class="fas fa-tasks"></i> Personalized Action Plan</h2>
-                    <div class="motivational">"Small steps today lead to big victories tomorrow!"</div>
+                    <h2 class="tab-title"><i class='bx bx-task'></i> Personalized Action Plan</h2>
+                    <div class="motivational">"Small steps today lead to big victories tomorrow! 🚀"</div>
                     <p>Your step-by-step plan to improve mental wellness based on our conversations.</p>
-                    
+
                     <div class="action-plan">
-                        <h3><i class="fas fa-clipboard-list"></i> This Week's Goals</h3>
-                        
+                        <h3><i class='bx bx-task'></i> This Week's Goals</h3>
+
                         <div class="action-item">
                             <div class="action-check">
-                                <i class="fas fa-check"></i>
+                                <i class='bx bx-check'></i>
                             </div>
                             <div class="action-text">
                                 <h4>Practice deep breathing</h4>
                                 <p>5 minutes of mindful breathing each morning</p>
                             </div>
                         </div>
-                        
+
                         <div class="action-item">
                             <div class="action-check">
-                                <i class="fas fa-check"></i>
+                                <i class='bx bx-check'></i>
                             </div>
                             <div class="action-text">
                                 <h4>Connect with a friend</h4>
                                 <p>Reach out to someone you trust this week</p>
                             </div>
                         </div>
-                        
+
                         <div class="action-item">
                             <div class="action-check">
-                                <i class="fas fa-check"></i>
+                                <i class='bx bx-check'></i>
                             </div>
                             <div class="action-text">
                                 <h4>Physical activity</h4>
                                 <p>20 minutes of movement at least 3 times this week</p>
                             </div>
                         </div>
-                        
+
                         <div class="action-item">
                             <div class="action-check">
-                                <i class="fas fa-check"></i>
+                                <i class='bx bx-check'></i>
                             </div>
                             <div class="action-text">
                                 <h4>Gratitude journal</h4>
@@ -1047,48 +1175,48 @@
                             </div>
                         </div>
                     </div>
-                    
+
                     <div class="action-plan">
-                        <h3><i class="fas fa-book"></i> Recommended Resources</h3>
-                        
+                        <h3><i class='bx bx-book-open'></i> Recommended Resources</h3>
+
                         <div class="resource-item">
                             <div class="resource-icon">
-                                <i class="fas fa-book"></i>
+                                <i class='bx bx-book'></i>
                             </div>
                             <div class="resource-content">
                                 <h3>"Feeling Good" by Dr. David Burns</h3>
                                 <p>Cognitive behavioral therapy techniques for depression</p>
                             </div>
                         </div>
-                        
+
                         <div class="resource-item">
                             <div class="resource-icon">
-                                <i class="fas fa-headphones"></i>
+                                <i class='bx bx-headphone'></i>
                             </div>
                             <div class="resource-content">
                                 <h3>Anxiety Relief Meditation</h3>
                                 <p>15-minute guided session for immediate calm</p>
-                                <a href="#">Listen Now <i class="fas fa-arrow-right"></i></a>
+                                <a href="#">Listen Now <i class='bx bx-right-arrow-alt'></i></a>
                             </div>
                         </div>
                     </div>
                 </div>
-                
+
                 <!-- Emergency Tab -->
                 <div class="tab-content" id="emergency-tab">
-                    <h2 class="tab-title"><i class="fas fa-life-ring"></i> Emergency Support</h2>
-                    <div class="motivational">"You are enough, and help is always available!"</div>
+                    <h2 class="tab-title"><i class='bx bx-shield'></i> Emergency Support</h2>
+                    <div class="motivational">"You are enough, and help is always available! 💖"</div>
                     <p>Immediate resources and contacts for crisis situations.</p>
-                    
+
                     <div class="crisis-alert">
                         <h3>If you're in immediate danger:</h3>
                         <p>Call 112 or go to your nearest emergency room</p>
                     </div>
-                    
+
                     <div class="card-grid">
                         <div class="card">
                             <div class="card-header">
-                                <i class="fas fa-phone-alt"></i>
+                                <i class='bx bx-phone'></i>
                                 Emergency Contacts
                             </div>
                             <div class="card-body">
@@ -1115,10 +1243,10 @@
                                 </div>
                             </div>
                         </div>
-                        
+
                         <div class="card">
                             <div class="card-header">
-                                <i class="fas fa-globe-americas"></i>
+                                <i class='bx bx-globe'></i>
                                 Additional Resources
                             </div>
                             <div class="card-body">
@@ -1139,18 +1267,18 @@
                             </div>
                         </div>
                     </div>
-                    
+
                     <div class="disclaimer">
                         <p><strong>Important:</strong> MindAid is not a substitute for professional mental health care. In crisis situations, please contact emergency services or a crisis hotline immediately.</p>
                     </div>
                 </div>
-                
+
                 <!-- Feedback Tab -->
                 <div class="tab-content" id="feedback-tab">
-                    <h2 class="tab-title"><i class="fas fa-comment"></i> Feedback</h2>
-                    <div class="motivational">"Your feedback helps us grow and serve you better!"</div>
+                    <h2 class="tab-title"><i class='bx bx-comment'></i> Feedback</h2>
+                    <div class="motivational">"Your feedback helps us grow and serve you better! 📝"</div>
                     <p>We value your input to improve MindAid Pro. Please share your thoughts below.</p>
-                    
+
                     <form class="feedback-form" action="mailto:arnizz077@gmail.com?subject=MindAid%20Pro%20Feedback" method="POST" enctype="text/plain">
                         <textarea id="feedback-text" name="body" placeholder="Share your feedback or suggestions..." required></textarea>
                         <button type="submit">Submit Feedback</button>
@@ -1158,7 +1286,7 @@
                 </div>
             </div>
         </div>
-        
+
         <footer>
             <p>MindAid Pro - Mental Health First Aid Assistant | This is a demonstration project only</p>
             <p>Note: Conversations are not stored or monitored. In real crisis situations, please contact professionals immediately.</p>
@@ -1167,14 +1295,12 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Authentication state
             let isAuthenticated = false;
             let currentUser = null;
             let currentLanguage = localStorage.getItem('language') || 'english';
             const users = JSON.parse(localStorage.getItem('users')) || {};
             const moodData = JSON.parse(localStorage.getItem('moodData')) || {};
 
-            // Language data
             const languageData = {
                 english: {
                     initialMessages: [
@@ -1190,175 +1316,175 @@
                     crisisResponse: "You're not alone, and help is here. Would you like assistance in reaching out to any of these resources?",
                     copingStrategies: {
                         anxiety: [
-                            "Try deep breathing: Inhale for 4 seconds, hold for 7, exhale for 8. Repeat 5 times.",
-                            "Use the 5-4-3-2-1 technique: Name 5 things you see, 4 you can touch, 3 you hear, 2 you smell, and 1 you taste.",
-                            "Take a short walk in a park or garden to clear your mind.",
-                            "Jot down your worries in a notebook to organize your thoughts."
+                            "Try deep breathing: Inhale for 4 seconds, hold for 7, exhale for 8. Repeat 5 times. 🌬️",
+                            "Use the 5-4-3-2-1 technique: Name 5 things you see, 4 you can touch, 3 you hear, 2 you smell, and 1 you taste. 👀",
+                            "Take a short walk in a park or garden to clear your mind. 🌳",
+                            "Jot down your worries in a notebook to organize your thoughts. 📝"
                         ],
                         depression: [
-                            "Reach out to a close friend or family member for a chat.",
-                            "Do something you enjoy, like listening to music or sketching, for 5 minutes.",
-                            "Say kind words to yourself, like you would to a dear friend.",
-                            "Set a small goal, like making a cup of tea or coffee."
+                            "Reach out to a close friend or family member for a chat. 📞",
+                            "Do something you enjoy, like listening to music or sketching, for 5 minutes. 🎶",
+                            "Say kind words to yourself, like you would to a dear friend. 💖",
+                            "Set a small goal, like making a cup of tea or coffee. ☕"
                         ],
                         stress: [
-                            "Break your tasks into smaller steps. What's one thing you can do now?",
-                            "Try a 5-minute stretch to ease physical tension.",
-                            "Make a quick to-do list to feel more in control.",
-                            "Sip a calming drink like herbal tea to relax."
+                            "Break your tasks into smaller steps. What's one thing you can do now? 📋",
+                            "Try a 5-minute stretch to ease physical tension. 🤸",
+                            "Make a quick to-do list to feel more in control. ✅",
+                            "Sip a calming drink like herbal tea to relax. 🍵"
                         ],
                         sleep: [
-                            "Create a bedtime routine, like reading or drinking warm milk.",
-                            "Keep your room cool and cozy with soft bedding.",
-                            "Skip caffeine after the afternoon.",
-                            "Listen to calm music before sleeping."
+                            "Create a bedtime routine, like reading or drinking warm milk. 📖",
+                            "Keep your room cool and cozy with soft bedding. 🛌",
+                            "Skip caffeine after the afternoon. ☕",
+                            "Listen to calm music before sleeping. 🎶"
                         ],
                         relationships: [
-                            "Listen actively when talking to loved ones, without interrupting.",
-                            "Use 'I feel' statements to share your emotions clearly.",
-                            "Spend quality time with family or friends, like during meals.",
-                            "Handle conflicts calmly, respecting everyone's views."
+                            "Listen actively when talking to loved ones, without interrupting. 👂",
+                            "Use 'I feel' statements to share your emotions clearly. 💬",
+                            "Spend quality time with family or friends, like during meals. 🍽️",
+                            "Handle conflicts calmly, respecting everyone's views. 🤝"
                         ]
                     },
                     responses: {
-                        anxiety: "I hear you're feeling anxious. It's okay, we can work through this together. Want to try some calming techniques?",
-                        depression: "Feeling low can be really tough. Let's take it one step at a time. Would you like a suggestion to lift your mood?",
-                        stress: "Stress can feel heavy, I get it. What's got you so overwhelmed? Let's talk about it.",
-                        sleep: "Trouble sleeping can make things harder. Want some tips to help you rest better?",
-                        relationships: "Relationships can be complex. I'm here to listen. What's going on with you?",
-                        coping: "Let's explore some coping strategies to help you feel better:",
-                        thanks: "Glad I could help! You're doing great, keep it up.",
-                        thanksFollowUp: "Want to check out more tips or resources?",
+                        anxiety: "I hear you're feeling anxious. It's okay, we can work through this together. Want to try some calming techniques? 🌈",
+                        depression: "Feeling low can be really tough. Let's take it one step at a time. Would you like a suggestion to lift your mood? 💡",
+                        stress: "Stress can feel heavy, I get it. What's got you so overwhelmed? Let's talk about it. 🤗",
+                        sleep: "Trouble sleeping can make things harder. Want some tips to help you rest better? 🌙",
+                        relationships: "Relationships can be complex. I'm here to listen. What's going on with you? 💞",
+                        coping: "Let's explore some coping strategies to help you feel better: ✨",
+                        thanks: "Glad I could help! You're doing great, keep it up. 🌟",
+                        thanksFollowUp: "Want to check out more tips or resources? 📚",
                         generic: [
-                            "Thanks for sharing. Want to tell me more about what's going on?",
-                            "I appreciate you opening up. How's this affecting your day-to-day?",
-                            "I'm all ears. What's something else you want to talk about?",
-                            "Sounds like a lot. What do you think might help right now?",
-                            "Let's figure this out together. What's next?"
+                            "Thanks for sharing. Want to tell me more about what's going on? 🤔",
+                            "I appreciate you opening up. How's this affecting your day-to-day? 🗣️",
+                            "I'm all ears. What's something else you want to talk about? 👂",
+                            "Sounds like a lot. What do you think might help right now? 💭",
+                            "Let's figure this out together. What's next? 🚀"
                         ]
                     }
                 },
                 hinglish: {
                     initialMessages: [
-                        "Namaste dosto! Main huun MindAid, aapka mental health buddy. 🌸<br>Aaj kya baat hai, kaise help karu?",
-                        "Dil ka haal batao ya quick buttons dabao. Kya chal raha hai, bolo?"
+                        "Namaste dost! Main hoon MindAid, tera mental health buddy. 🌸<br>Aaj kaisa feel kar raha hai, kya help chahiye?",
+                        "Jo bhi dil mein hai, type kar ya quick buttons se shuru kar. Kya chal raha hai, mujhe bata?"
                     ],
                     quickReplies: [
-                        { text: "Mujhe tension ho rahi hai 😰", value: "I'm feeling anxious" },
-                        { text: "Mera mood thoda down hai 😔", value: "I'm feeling low" },
-                        { text: "Bohot stress mein huun 😥", value: "I'm stressed out" },
-                        { text: "Mujhe kuch tips chahiye", value: "I need coping tips" }
+                        { text: "Mujhe ghabrahat ho rahi hai 😰", value: "I'm feeling anxious" },
+                        { text: "Dil thoda udaas hai 😔", value: "I'm feeling low" },
+                        { text: "Bohot tension mein hoon 😥", value: "I'm stressed out" },
+                        { text: "Mujhe kuch tips do", value: "I need coping tips" }
                     ],
-                    crisisResponse: "Arre, tu akela nahi hai, yaar. Inme se kisi resource se baat karna chahiye, kya bolta hai?",
+                    crisisResponse: "Arre, tu bilkul akela nahi hai, yaar. In resources mein se kisi se baat karna chahega kya?",
                     copingStrategies: {
                         anxiety: [
-                            "Thodi si pranayama karo: 4 second saans andar, 7 second hold, 8 second bahar. 5 baar try karo.",
-                            "5-4-3-2-1 trick lagao: 5 cheezein dekho, 4 chhune ki, 3 sunne ki, 2 smell karne ki, aur 1 taste karne ki.",
-                            "Chhoti si garden walk lo, dimag fresh ho jayega.",
-                            "Apni tension ko diary mein likho, dil halka hoga."
+                            "Thoda sa deep breathing try kar: 4 second saans le, 7 second hold kar, 8 second saans chhod. 5 baar repeat kar. 🌬️",
+                            "5-4-3-2-1 technique use kar: 5 cheezein dekh, 4 ko chhu, 3 sune, 2 smell kar, aur 1 taste kar. 👀",
+                            "Park mein thodi der walk kar, dimag fresh ho jayega. 🌳",
+                            "Apne worries ko ek diary mein likh, dil halka ho jayega. 📝"
                         ],
                         depression: [
-                            "Kisi apne dost ya family wale se dil ki baat karo.",
-                            "Kuch pasand ka karo, jaise gaana suno ya 5 minute doodle banao.",
-                            "Apne aap se pyar se baat karo, jaise best friend se karta hai.",
-                            "Ek chhota goal set karo, jaise garam chai banani hai."
+                            "Kisi dost ya family wale se dil ki baat share kar. 📞",
+                            "Kuch pasand ka kaam kar, jaise 5 minute ke liye gaana sun ya drawing kar. 🎶",
+                            "Khud se pyar bhari baat kar, jaise ek dost se karta hai. 💖",
+                            "Ek chhota goal set kar, jaise chai ya coffee banani hai. ☕"
                         ],
                         stress: [
-                            "Kaam ko chhote chhote steps mein todo. Abhi kya kar sakta hai?",
-                            "5 minute ka yoga stretch karo, body relax hogi.",
-                            "Ek quick to-do list banao taaki control mein lage.",
-                            "Adrak wali chai piyo, thodi shanti milegi."
+                            "Apne kaam ko chhote steps mein baant le. Abhi kya ek kaam ho sakta hai? 📋",
+                            "5 minute ka stretch kar, body relax ho jayegi. 🤸",
+                            "Ek chhoti to-do list bana, sab control mein lagega. ✅",
+                            "Thodi si herbal chai pi, thoda sukoon milega. 🍵"
                         ],
                         sleep: [
-                            "Raat ka routine banao, like garam doodh piyo ya thodi der kitab padho.",
-                            "Room ko thanda aur cozy rakho, achhi chaddar daal ke.",
-                            "Shaam ke baad coffee ya chai mat piyo.",
-                            "Soft music suno, neend jaldi aayegi."
+                            "Raat ka ek routine bana, jaise kitab padh ya garam doodh pi. 📖",
+                            "Apna room thanda aur cozy rakh, soft chadar daal ke. 🛌",
+                            "Shaam ke baad chai ya coffee avoid kar. ☕",
+                            "Thoda soft music sun, neend aane mein madad hogi. 🎶"
                         ],
                         relationships: [
-                            "Apnon ke saath baat karte waqt poori dhyan se suno.",
-                            "Apne feelings ko 'Mujhe lagta hai' se shuru karo, galatfaimi nahi hogi.",
-                            "Family ya doston ke saath khane ya festival mein dil se waqt bitto.",
-                            "Ladai ho to shaanti se, sabki izzat rakhte hue solve karo."
+                            "Apne pyaron ke saath baat karte waqt poori dhyan se sun. 👂",
+                            "'Mujhe aisa lagta hai' bolke apne feelings share kar. 💬",
+                            "Family ya doston ke saath khana khaate waqt quality time spend kar. 🍽️",
+                            "Agar jhagda ho, to shaanti se baat kar, sabki izzat rakh ke. 🤝"
                         ]
                     },
                     responses: {
-                        anxiety: "Tension lene ki koi baat nahi, yaar. Saath mein kuch calming tricks try karein?",
-                        depression: "Thoda low feel kar raha hai? Ek chhota saath mein chalte hain, kya bolta hai?",
-                        stress: "Stress toh banta hai, par thodi si baat kar le. Sabse zyada kya pareshan kar raha hai?",
-                        sleep: "Neend nahi aa rahi? Thodi si help chahiye better sleep ke liye?",
-                        relationships: "Rishton ka chakkar hai, samjha. Kya scene hai, thoda aur bata?",
-                        coping: "Chalo, kuch cool coping tips dekhte hain:",
-                        thanks: "Shukriya, dost! Tu toh star hai, aise hi chhota rahe.",
-                        thanksFollowUp: "Aur koi tip ya resource check karna hai?",
+                        anxiety: "Arre, ghabrahat ho rahi hai? Koi baat nahi, hum saath mein handle kar lenge. Kuch calming tips try karein? 🌈",
+                        depression: "Dil udaas hai, samajh gaya. Ek-ek kadam chalte hain. Mood thoda better karne ka idea doon? 💡",
+                        stress: "Tension toh banta hai, yaar. Kya cheez zyada pareshan kar rahi hai? Baat karte hain. 🤗",
+                        sleep: "Neend nahi aa rahi? Chalo, better sleep ke liye kuch tips dete hain. 🌙",
+                        relationships: "Rishton ka chakkar hai, samajh gaya. Kya ho raha hai, thoda aur bata? 💞",
+                        coping: "Chalo, kuch naye coping ideas dekhte hain jo dil ko sukoon de: ✨",
+                        thanks: "Shukriya, dost! Tu bohot achha kar raha hai, aise hi continue kar. 🌟",
+                        thanksFollowUp: "Aur koi tip ya resource dekhna hai kya? 📚",
                         generic: [
-                            "Dil se dil tak, bata kya chal raha hai.",
-                            "Teri baat sunke achha laga. Isse roz ka jeevan kaise affect ho raha?",
-                            "Main huun na, aur kya share karna chahta hai?",
-                            "Thodi si mushkil to banta hai. Ab kya karna hai, bolo?",
-                            "Chalo, saath mein iska kuch jugad karte hain."
+                            "Dil khol ke batane ke liye shukriya. Aur kya chal raha hai, thoda aur bata? 🤔",
+                            "Teri baat sunke achha laga. Yeh roz ki zindagi pe kaisa asar daal raha hai? 🗣️",
+                            "Main sun raha hoon. Aur kya baat karni hai? 👂",
+                            "Thoda heavy lag raha hai. Abhi kya karna chahiye, kya sochta hai? 💭",
+                            "Chalo, saath mein iska kuch karte hain. Agla step kya hai? 🚀"
                         ]
                     }
                 },
                 tanglish: {
                     initialMessages: [
-                        "Vanakkam! Naan MindAid, ungaloda mental health dostu. 😊<br>Innaiku enna vishayam, eppadi help pannalam?",
-                        "Manasula enna irukku? Type pannu illa quick buttons press pannu, sollu."
+                        "Vanakkam machi! Naan MindAid, un mental health dostu. 😊<br>Innaiku eppadi irukka, enna help venum?",
+                        "Manasula enna irukku, type pannu illa quick buttons press pannu. Enna nadakkuthu, sollu pa!"
                     ],
                     quickReplies: [
-                        { text: "Enakku konjam tensiona irukku 😰", value: "I'm feeling anxious" },
-                        { text: "Naan downa feel pannuren 😔", value: "I'm feeling low" },
-                        { text: "Romba stressa irukken 😥", value: "I'm stressed out" },
-                        { text: "Enakku konjam tips venum", value: "I need coping tips" }
+                        { text: "Enakku bayama irukku 😰", value: "I'm feeling anxious" },
+                        { text: "Manasu downa irukku 😔", value: "I'm feeling low" },
+                        { text: "Romba pressurea irukku 😥", value: "I'm stressed out" },
+                        { text: "Konjam tips venum", value: "I need coping tips" }
                     ],
-                    crisisResponse: "Dei, nee thaniya illa, machan. Intha resources-la ethavathu contact pannanuma?",
+                    crisisResponse: "Machi, nee thaniya illa, namba irukkom. Intha resources-la yaarukittaiyavathu pesanuma?",
                     copingStrategies: {
                         anxiety: [
-                            "Deep breathing pannu: 4 seconds saans le, 7 seconds hold pannu, 8 seconds velila vidu. 5 thadava try pannu.",
-                            "5-4-3-2-1 technique pannu: 5 paakuren, 4 thotturen, 3 ketkuren, 2 vaasam pannuren, 1 taste pannuren.",
-                            "Konjam park-la walk pannu, manasu fresh aagum da.",
-                            "Un tensiona notebook-la ezhuthu, konjam clear aagum."
+                            "Deep breathing pannu: 4 seconds saans edu, 7 seconds hold pannu, 8 seconds velila vidu. 5 thadava pannu. 🌬️",
+                            "5-4-3-2-1 technique try pannu: 5 paakuren, 4 thotturen, 3 ketkuren, 2 vaasanai pannuren, 1 taste pannuren. 👀",
+                            "Park-la konjam nadanthu vaa, manasu konjam fresh aagum. 🌳",
+                            "Un tension-a notebook-la ezhuthu, konjam clear aagum da. 📝"
                         ],
                         depression: [
-                            "Close friend or family kuda konjam pesu, manasu light aagum.",
-                            "Favorite song kettuko illa 5 minute sketch pannu, mood konjam maaraum.",
-                            "Nee nalla friend maari unna motivate pannu, 'Nee super da' nu sollu.",
-                            "Chinna goal vachuko, filter coffee pannurathu maari."
+                            "Nalla friend-a illa family-a konjam pesu, manasu light aagum. 📞",
+                            "Unakku pudicha paattu kettu illa 5 minute sketch pannu, mood konjam maaraum. 🎶",
+                            "Unna nee nalla friend maari encourage pannu, 'Nee super da' nu sollu. 💖",
+                            "Chinna goal vachuko, filter coffee pannurathu maari. ☕"
                         ],
                         stress: [
-                            "Work-a chinnachinna steps-a pannu. Ippo enna pannalam?",
-                            "5 minute yoga stretch pannu, body relax aagum da.",
-                            "Quick to-do list pannu, ellam control-la irukum.",
-                            "Tulsi tea kudichu, konjam chill pannu."
+                            "Vela-ya chinnachinna steps-a pannu. Ippo enna pannalam? 📋",
+                            "5 minute stretch pannu, body relax aagum da. 🤸",
+                            "Quick to-do list pannu, ellam control-la irukum. ✅",
+                            "Tulsi tea kudichu, konjam chill pannu. 🍵"
                         ],
                         sleep: [
-                            "Night routine pannu, paal kudichu illa konjam book padichu thoongu.",
-                            "Room-a cool and cozy-a vechuko, nalla bed sheet podu.",
-                            "Evening coffee or tea avoid pannu, thoonga mudiyum.",
-                            "Soft Tamil songs kettuko, thoongurathukku munna."
+                            "Night routine pannu, paal kudichu illa konjam book padichu thoongu. 📖",
+                            "Room-a cool-a vechuko, soft bed sheet podu. 🛌",
+                            "Evening coffee illa tea kudikkaatha, thoonga mudiyum. ☕",
+                            "Soft Tamil paatu kettu, thoongurathukku munna. 🎶"
                         ],
                         relationships: [
-                            "Pesumpo active-a keku, friend kuda illa family kuda.",
-                            "Un feelings-a 'Naan' nu start pannu, confusion varathu.",
-                            "Family or friends kuda sapadu time or festival-la nalla time spend pannu.",
-                            "Problem na calm-a solve pannu, ellaroda respect pannu."
+                            "Pesumpo nalla ketu, friend-a illa family-a irunthaalum. 👂",
+                            "'Enakku ippadi thonuthu' nu sollu, confusion varathu. 💬",
+                            "Family illa friends kuda sapadu time-la nalla iru. 🍽️",
+                            "Problem na calm-a solve pannu, ellaroda feelings respect pannu. 🤝"
                         ]
                     },
                     responses: {
-                        anxiety: "Konjam tensiona irukku? Sari, naama saathu handle pannalam. Konjam tips venuma?",
-                        depression: "Manasu low-va irukku? Chinnachinna steps edukkalaam, va?",
-                        stress: "Stress feeling heavy, machan? Enna matter, konjam sollu paakalam.",
-                        sleep: "Thoongala? Konjam help pannalam, better sleep venuma?",
-                        relationships: "Relationship vishayam thaan, sari. Innum konjam sollu, enna nadakkuthu?",
-                        coping: "Vaa, konjam cool coping tips paakalam:",
-                        thanks: "Nandri, dostu! Nee super, appadiye continue pannu.",
-                        thanksFollowUp: "Innum ethavathu tips illa resources paaklama?",
+                        anxiety: "Bayama irukku nu solra, sari da. Namma saathu paakalam. Konjam tips venuma? 🌈",
+                        depression: "Manasu downa irukku, paavam. Chinnachinna steps edukkalaam, idea venuma? 💡",
+                        stress: "Pressure romba irukku nu solra, machi. Enna matter, konjam pesalaam? 🤗",
+                        sleep: "Thoongala illa? Konjam help pannalam, nalla thoonga tips venuma? 🌙",
+                        relationships: "Relationship vishayam thaan, sari. Innum konjam sollu, enna nadakkuthu? 💞",
+                        coping: "Vaa, konjam nalla coping tips paakalam: ✨",
+                        thanks: "Nandri da, machi! Nee super pannura, ippadiye continue pannu. 🌟",
+                        thanksFollowUp: "Innum ethavathu tips illa resources paaklama? 📚",
                         generic: [
-                            "Manasula enna irukku, sollu paakalam.",
-                            "Un baat kekka nalla irukku. Idhu daily life-a eppadi affect pannuthu?",
-                            "Naan irukken, vera enna share pannanumnu irukku?",
-                            "Konjam tough-a irukku, aana saathu manage pannalam. Next enna?",
-                            "Vaa, saathu konjam solutions kandupidikkalam!"
+                            "Sollu, manasula enna irukku, konjam share pannu paakalam. 🤔",
+                            "Un baat kekka nalla irukku. Idhu daily life-a eppadi paathukuthu? 🗣️",
+                            "Naan irukken, vera enna pesalam sollu? 👂",
+                            "Konjam kastama irukku, aana manage pannalam. Next enna pannalam? 💭",
+                            "Vaa, saathu konjam ideas paakalam! 🚀"
                         ]
                     }
                 }
