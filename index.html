@@ -1391,15 +1391,15 @@
                     ],
                     quickReplies: [
                         { text: "Enakku bayama irukku 😰", value: "I'm feeling anxious" },
-                        { text: "Manasu downah irukku 😔", value: "I'm feeling low" },
-                        { text: "Romba pressure ah irukku 😥", value: "I'm stressed out" },
+                        { text: "Manasu downa irukku 😔", value: "I'm feeling low" },
+                        { text: "Romba pressurea irukku 😥", value: "I'm stressed out" },
                         { text: "Konjam tips venum", value: "I need coping tips" },
                     ],
                     crisisResponse: "Machi, nee thaniya illa, namba irukkom. Intha resources-la yaarukittaiyavathu pesanuma?",
                     copingStrategies: {
                         anxiety: [
-                            "Deep breathing pannu: 4 seconds moocha ilu, 7 seconds hold pannu, 8 seconds velila vidu. 5 thadava pannu. 🌬️",
-                            "5-4-3-2-1 technique try pannu: 5 paakuren, 4 thoduren, 3 ketkuren, 2 vaasanai pannuren, 1 taste pannuren. 👀",
+                            "Deep breathing pannu: 4 seconds saans edu, 7 seconds hold pannu, 8 seconds velila vidu. 5 thadava pannu. 🌬️",
+                            "5-4-3-2-1 technique try pannu: 5 paakuren, 4 thotturen, 3 ketkuren, 2 vaasanai pannuren, 1 taste pannuren. 👀",
                             "Park-la konjam nadanthu vaa, manasu konjam fresh aagum. 🌳",
                             "Un tension-a notebook-la ezhuthu, konjam clear aagum da. 📝",
                         ],
@@ -1439,10 +1439,10 @@
                         thanksFollowUp: "Innum ethavathu tips illa resources paaklama? 📚",
                         generic: [
                             "Sollu, manasula enna irukku, konjam share pannu paakalam. 🤔",
-                            "Un pecha kekka nalla irukku. Idhu daily life-a eppadi paathukuthu? 🗣️",
+                            "Un baat kekka nalla irukku. Idhu daily life-a eppadi paathukuthu? 🗣️",
                             "Naan irukken, vera enna pesalam sollu? 👂",
                             "Konjam kastama irukku, aana manage pannalam. Next enna pannalam? 💭",
-                            "Vaa, sernthu konjam ideas paakalam! 🚀",
+                            "Vaa, saathu konjam ideas paakalam! 🚀",
                         ],
                     },
                 },
@@ -1764,14 +1764,42 @@
                 },
             };
 
-            // Event listeners
-            sendBtn.addEventListener('click', sendMessage);
-            
-            userInput.addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') {
-                    sendMessage();
-                }
-            });
+            // Event Listeners
+            const setupEventListeners = () => {
+                elements.toggleToRegister.addEventListener("click", () => {
+                    elements.loginForm.style.display = "none";
+                    elements.registerForm.style.display = "flex";
+                });
+
+                elements.toggleToLogin.addEventListener("click", () => {
+                    elements.loginForm.style.display = "flex";
+                    elements.registerForm.style.display = "none";
+                });
+
+                document.getElementById("register-btn").addEventListener("click", auth.register);
+                document.getElementById("login-btn").addEventListener("click", auth.login);
+                elements.logoutBtn.addEventListener("click", auth.logout);
+
+                elements.languageSelector.addEventListener("change", () => {
+                    state.currentLanguage = elements.languageSelector.value;
+                    localStorage.setItem("language", state.currentLanguage);
+                    app.updateChatLanguage();
+                });
+
+                elements.tabLinks.forEach((link) => {
+                    link.addEventListener("click", (e) => {
+                        e.preventDefault();
+                        if (link.getAttribute("data-tab") === "mood" && !state.isAuthenticated) {
+                            alert("Please login to access the Mood Tracker");
+                            return;
+                        }
+                        elements.tabLinks.forEach((l) => l.classList.remove("active"));
+                        link.classList.add("active");
+                        elements.tabContents.forEach((c) => c.classList.remove("active"));
+                        document.getElementById(`${link.getAttribute("data-tab")}-tab`).classList.add("active");
+                    });
+                });
+        
 
             // Initial bot messages
             setTimeout(() => {
