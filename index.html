@@ -3,13 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="MindAid Pro - A mental health first aid assistant">
+    <meta name="author" content="MindAid Team">
     <title>MindAid Pro - Mental Health First Aid Assistant</title>
-    <!-- Boxicons CDN for new icons -->
-    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <!-- Boxicons CDN -->
+    <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
     <!-- Poppins Font -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <!-- Confetti.js for fun effects -->
+    <!-- Confetti.js -->
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+    <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <style>
         :root {
@@ -31,11 +34,11 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Poppins', sans-serif;
+            font-family: "Poppins", sans-serif;
         }
 
         body {
-            background: linear-gradient(135deg, #f4e7ff 0%, #ffdeeb 100%);
+            background: linear-gradient(135deg, var(--background) 0%, #ffdeeb 100%);
             min-height: 100vh;
             display: flex;
             justify-content: center;
@@ -46,7 +49,7 @@
             overflow-x: hidden;
         }
 
-        .container {
+        .container, .auth-container {
             width: 100%;
             max-width: 1200px;
             background: var(--card-bg);
@@ -55,27 +58,21 @@
             box-shadow: var(--container-shadow);
             border: 1px solid rgba(255, 255, 255, 0.3);
             overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            height: 95vh;
         }
 
         .auth-container {
-            width: 100%;
             max-width: 400px;
-            background: var(--card-bg);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            box-shadow: var(--container-shadow);
             padding: 40px;
             text-align: center;
-            border: 1px solid rgba(255, 255, 255, 0.3);
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
         }
 
         .auth-title {
             font-size: 1.8rem;
+            font-weight: 600;
             color: var(--text);
-            margin-bottom: 20px;
             text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
 
@@ -92,6 +89,13 @@
             font-size: 1rem;
             background: rgba(255, 255, 255, 0.1);
             color: var(--text);
+            transition: var(--transition);
+        }
+
+        .auth-form input:focus {
+            outline: none;
+            border-color: var(--secondary);
+            box-shadow: 0 0 0 3px rgba(162, 155, 254, 0.2);
         }
 
         .auth-form button {
@@ -102,6 +106,7 @@
             border-radius: 10px;
             cursor: pointer;
             font-size: 1rem;
+            font-weight: 500;
             transition: var(--transition);
             box-shadow: 0 4px 15px rgba(255, 111, 145, 0.3);
         }
@@ -114,7 +119,7 @@
         .auth-toggle {
             color: var(--secondary);
             cursor: pointer;
-            margin-top: 10px;
+            font-size: 0.9rem;
             transition: var(--transition);
         }
 
@@ -122,16 +127,10 @@
             color: var(--secondary-dark);
         }
 
-        .motivational {
-            background: linear-gradient(45deg, var(--success) 0%, #00b894 100%);
-            color: white;
-            padding: 15px;
-            border-radius: 12px;
-            margin-bottom: 20px;
-            text-align: center;
-            font-style: italic;
-            font-size: 1.1rem;
-            box-shadow: 0 4px 15px rgba(85, 239, 196, 0.3);
+        .container {
+            display: flex;
+            flex-direction: column;
+            height: 95vh;
         }
 
         header {
@@ -157,12 +156,10 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: 20px;
         }
 
         .logo-icon i {
-            display: inline-block !important;
-            visibility: visible !important;
+            font-size: 20px;
         }
 
         .logo-text h1 {
@@ -182,7 +179,7 @@
             align-items: center;
         }
 
-        .user-btn {
+        .user-btn, .chat-btn {
             background: rgba(255, 255, 255, 0.2);
             color: white;
             border: none;
@@ -197,15 +194,19 @@
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
         }
 
-        .user-btn:hover {
+        .chat-btn {
+            background: var(--primary);
+            box-shadow: 0 4px 15px rgba(255, 111, 145, 0.3);
+        }
+
+        .user-btn:hover, .chat-btn:hover {
             background: rgba(255, 255, 255, 0.3);
             transform: translateY(-2px);
             box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
         }
 
-        .user-btn i {
-            display: inline-block !important;
-            visibility: visible !important;
+        .chat-btn:hover {
+            background: var(--primary-dark);
         }
 
         .language-selector {
@@ -234,7 +235,6 @@
             width: 240px;
             background: rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(10px);
-            border-right: none;
             display: flex;
             flex-direction: column;
             padding: 20px 0;
@@ -257,19 +257,12 @@
             text-align: center;
             font-size: 20px;
             color: var(--secondary);
-            display: inline-block !important;
-            visibility: visible !important;
         }
 
-        .nav-item.active {
+        .nav-item.active, .nav-item:hover {
             background: rgba(162, 155, 254, 0.2);
             color: var(--secondary-dark);
             border-left: 4px solid var(--secondary-dark);
-        }
-
-        .nav-item:hover {
-            background: rgba(162, 155, 254, 0.3);
-            color: var(--secondary-dark);
         }
 
         .main-content {
@@ -290,6 +283,18 @@
             display: block;
         }
 
+        .motivational {
+            background: linear-gradient(45deg, var(--success) 0%, #00b894 100%);
+            color: white;
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-style: italic;
+            font-size: 1.1rem;
+            box-shadow: 0 4px 15px rgba(85, 239, 196, 0.3);
+        }
+
         .chat-container {
             height: 100%;
             display: flex;
@@ -303,12 +308,12 @@
             padding: 15px;
             display: flex;
             flex-direction: column;
+            gap: 15px;
         }
 
         .message {
             max-width: 75%;
             padding: 12px 18px;
-            margin-bottom: 15px;
             border-radius: 15px;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
             line-height: 1.5;
@@ -331,7 +336,6 @@
 
         .user-message {
             background: rgba(255, 111, 145, 0.2);
-            color: var(--text);
             border-bottom-right-radius: 4px;
             align-self: flex-end;
         }
@@ -416,33 +420,6 @@
             box-shadow: 0 0 0 3px rgba(162, 155, 254, 0.2);
         }
 
-        .chat-btn {
-            background: var(--primary);
-            color: white;
-            border: none;
-            border-radius: 50%;
-            width: 45px;
-            height: 45px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            cursor: pointer;
-            transition: var(--transition);
-            font-size: 16px;
-            box-shadow: 0 4px 15px rgba(255, 111, 145, 0.3);
-        }
-
-        .chat-btn:hover {
-            background: var(--primary-dark);
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(255, 111, 145, 0.4);
-        }
-
-        .chat-btn i {
-            display: inline-block !important;
-            visibility: visible !important;
-        }
-
         .quick-replies {
             display: flex;
             flex-wrap: wrap;
@@ -487,8 +464,6 @@
             justify-content: center;
             align-items: center;
             font-size: 20px;
-            display: inline-block !important;
-            visibility: visible !important;
         }
 
         .card-grid {
@@ -526,8 +501,6 @@
         .card-header i {
             color: var(--primary);
             font-size: 18px;
-            display: inline-block !important;
-            visibility: visible !important;
         }
 
         .card-body {
@@ -558,11 +531,6 @@
             flex-shrink: 0;
         }
 
-        .resource-icon i {
-            display: inline-block !important;
-            visibility: visible !important;
-        }
-
         .resource-content h3 {
             font-size: 1rem;
             margin-bottom: 4px;
@@ -588,11 +556,6 @@
 
         .resource-content a:hover {
             text-decoration: underline;
-        }
-
-        .resource-content a i {
-            display: inline-block !important;
-            visibility: visible !important;
         }
 
         .chart-container {
@@ -640,8 +603,6 @@
             font-size: 28px;
             margin-bottom: 10px;
             display: block;
-            display: inline-block !important;
-            visibility: visible !important;
         }
 
         .mood-btn span {
@@ -675,8 +636,6 @@
         .action-plan h3 i {
             color: var(--primary);
             font-size: 18px;
-            display: inline-block !important;
-            visibility: visible !important;
         }
 
         .action-item {
@@ -709,15 +668,6 @@
             color: white;
         }
 
-        .action-check i {
-            display: inline-block !important;
-            visibility: visible !important;
-        }
-
-        .action-text {
-            flex: 1;
-        }
-
         .action-text h4 {
             margin-bottom: 4px;
             color: var(--text);
@@ -732,6 +682,9 @@
         .feedback-form {
             max-width: 500px;
             margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
         }
 
         .feedback-form textarea {
@@ -741,10 +694,16 @@
             border: 1px solid rgba(255, 255, 255, 0.3);
             border-radius: 12px;
             resize: vertical;
-            margin-bottom: 12px;
             font-size: 0.9rem;
             background: rgba(255, 255, 255, 0.1);
             color: var(--text);
+            transition: var(--transition);
+        }
+
+        .feedback-form textarea:focus {
+            outline: none;
+            border-color: var(--secondary);
+            box-shadow: 0 0 0 3px rgba(162, 155, 254, 0.2);
         }
 
         .feedback-form button {
@@ -755,6 +714,7 @@
             border-radius: 12px;
             cursor: pointer;
             font-size: 0.9rem;
+            font-weight: 500;
             transition: var(--transition);
             box-shadow: 0 4px 15px rgba(255, 111, 145, 0.3);
         }
@@ -805,7 +765,7 @@
             left: 20px;
             width: 60px;
             height: 60px;
-            background: url('https://img.icons8.com/emoji/48/000000/smiling-face-with-heart-eyes.png') no-repeat center;
+            background: url("https://img.icons8.com/emoji/48/000000/smiling-face-with-heart-eyes.png") no-repeat center;
             background-size: contain;
             animation: float 3s ease-in-out infinite;
         }
@@ -862,15 +822,15 @@
     <div class="auth-container" id="auth-container">
         <h2 class="auth-title">Welcome to MindAid Pro</h2>
         <div class="auth-form" id="login-form">
-            <input type="email" id="login-email" placeholder="Email" required>
-            <input type="password" id="login-password" placeholder="Password" required>
+            <input type="email" id="login-email" placeholder="Email" required aria-label="Email">
+            <input type="password" id="login-password" placeholder="Password" required aria-label="Password">
             <button id="login-btn">Login</button>
             <div class="auth-toggle" id="toggle-to-register">Don't have an account? Register</div>
         </div>
         <div class="auth-form" id="register-form" style="display: none;">
-            <input type="email" id="register-email" placeholder="Email" required>
-            <input type="password" id="register-password" placeholder="Password" required>
-            <input type="password" id="confirm-password" placeholder="Confirm Password" required>
+            <input type="email" id="register-email" placeholder="Email" required aria-label="Email">
+            <input type="password" id="register-password" placeholder="Password" required aria-label="Password">
+            <input type="password" id="confirm-password" placeholder="Confirm Password" required aria-label="Confirm Password">
             <button id="register-btn">Register</button>
             <div class="auth-toggle" id="toggle-to-login">Already have an account? Login</div>
         </div>
@@ -880,7 +840,7 @@
         <header>
             <div class="logo">
                 <div class="logo-icon">
-                    <i class='bx bx-heart'></i>
+                    <i class="bx bx-heart"></i>
                 </div>
                 <div class="logo-text">
                     <h1>MindAid Pro</h1>
@@ -888,159 +848,158 @@
                 </div>
             </div>
             <div class="user-controls">
-                <select class="language-selector" id="language-selector">
+                <select class="language-selector" id="language-selector" aria-label="Select Language">
                     <option value="english">English</option>
                     <option value="hinglish">Hinglish</option>
                     <option value="tanglish">Tanglish</option>
                 </select>
-                <button class="user-btn" title="Notifications">
-                    <i class='bx bx-bell'></i>
+                <button class="user-btn" title="Notifications" aria-label="Notifications">
+                    <i class="bx bx-bell"></i>
                 </button>
-                <button class="user-btn" title="Settings">
-                    <i class='bx bx-cog'></i>
+                <button class="user-btn" title="Settings" aria-label="Settings">
+                    <i class="bx bx-cog"></i>
                 </button>
-                <button class="user-btn" title="User Profile">
-                    <i class='bx bx-user'></i>
+                <button class="user-btn" title="User Profile" aria-label="User Profile">
+                    <i class="bx bx-user"></i>
                 </button>
-                <button class="user-btn" id="logout-btn" title="Logout">
-                    <i class='bx bx-log-out'></i>
+                <button class="user-btn" id="logout-btn" title="Logout" aria-label="Logout">
+                    <i class="bx bx-log-out"></i>
                 </button>
             </div>
         </header>
 
         <div class="app-body">
-            <div class="sidebar">
-                <a href="#" class="nav-item active" data-tab="chat">
-                    <i class='bx bx-message-dots'></i>
+            <nav class="sidebar">
+                <a href="#" class="nav-item active" data-tab="chat" aria-label="Chat Support">
+                    <i class="bx bx-message-dots"></i>
                     <span>Chat Support</span>
                 </a>
-                <a href="#" class="nav-item" data-tab="mood">
-                    <i class='bx bx-line-chart'></i>
+                <a href="#" class="nav-item" data-tab="mood" aria-label="Mood Tracker">
+                    <i class="bx bx-line-chart"></i>
                     <span>Mood Tracker</span>
                 </a>
-                <a href="#" class="nav-item" data-tab="resources">
-                    <i class='bx bx-book'></i>
+                <a href="#" class="nav-item" data-tab="resources" aria-label="Resources">
+                    <i class="bx bx-book"></i>
                     <span>Resources</span>
                 </a>
-                <a href="#" class="nav-item" data-tab="plan">
-                    <i class='bx bx-task'></i>
+                <a href="#" class="nav-item" data-tab="plan" aria-label="Action Plan">
+                    <i class="bx bx-task"></i>
                     <span>Action Plan</span>
                 </a>
-                <a href="#" class="nav-item" data-tab="emergency">
-                    <i class='bx bx-shield'></i>
+                <a href="#" class="nav-item" data-tab="emergency" aria-label="Emergency">
+                    <i class="bx bx-shield"></i>
                     <span>Emergency</span>
                 </a>
-                <a href="#" class="nav-item" data-tab="feedback">
-                    <i class='bx bx-comment'></i>
+                <a href="#" class="nav-item" data-tab="feedback" aria-label="Feedback">
+                    <i class="bx bx-comment"></i>
                     <span>Feedback</span>
                 </a>
-            </div>
+            </nav>
 
             <div class="main-content">
                 <!-- Chat Support Tab -->
-                <div class="tab-content active" id="chat-tab">
-                    <h2 class="tab-title"><i class='bx bx-message-dots'></i> Mental Health Support</h2>
+                <section class="tab-content active" id="chat-tab">
+                    <h2 class="tab-title"><i class="bx bx-message-dots"></i> Mental Health Support</h2>
                     <div class="motivational">"You are stronger than you know, and every step counts! 🌟"</div>
                     <p>Chat with MindAid to get immediate support, coping strategies, and resources tailored to your needs.</p>
 
                     <div class="chat-container">
                         <div class="chat-messages" id="chat-messages">
                             <div class="message bot-message" id="initial-message">
-                                <span class="message-time">Today, 01:04 PM</span>
+                                <span class="message-time">Today, 02:38 PM</span>
                             </div>
-                            <div class="quick-replies" id="quick-replies">
-                            </div>
+                            <div class="quick-replies" id="quick-replies"></div>
                         </div>
                         <div class="mascot"></div>
                         <div class="input-container">
-                            <input type="text" id="user-input" placeholder="Type your message here..." autocomplete="off">
-                            <button class="chat-btn" id="send-btn">
-                                <i class='bx bx-send'></i>
+                            <input type="text" id="user-input" placeholder="Type your message here..." autocomplete="off" aria-label="Type your message">
+                            <button class="chat-btn" id="send-btn" aria-label="Send Message">
+                                <i class="bx bx-send"></i>
                             </button>
                         </div>
                     </div>
-                </div>
+                </section>
 
                 <!-- Mood Tracker Tab -->
-                <div class="tab-content" id="mood-tab">
-                    <h2 class="tab-title"><i class='bx bx-line-chart'></i> Mood Tracker</h2>
+                <section class="tab-content" id="mood-tab">
+                    <h2 class="tab-title"><i class="bx bx-line-chart"></i> Mood Tracker</h2>
                     <div class="motivational">"Every day is a new opportunity to nurture your inner peace! 🌈"</div>
                     <p>Track your emotional well-being over time to identify patterns and triggers.</p>
 
                     <div class="mood-selector">
-                        <div class="mood-btn" data-mood="excellent">
-                            <i class='bx bx-happy-alt'></i>
+                        <button class="mood-btn" data-mood="excellent" aria-label="Mood: Excellent">
+                            <i class="bx bx-happy-alt"></i>
                             Excellent
                             <span>Feeling great!</span>
-                        </div>
-                        <div class="mood-btn" data-mood="good">
-                            <i class='bx bx-smile'></i>
+                        </button>
+                        <button class="mood-btn" data-mood="good" aria-label="Mood: Good">
+                            <i class="bx bx-smile"></i>
                             Good
                             <span>Pretty good day</span>
-                        </div>
-                        <div class="mood-btn" data-mood="neutral">
-                            <i class='bx bx-meh'></i>
+                        </button>
+                        <button class="mood-btn" data-mood="neutral" aria-label="Mood: Neutral">
+                            <i class="bx bx-meh"></i>
                             Neutral
                             <span>Just okay</span>
-                        </div>
-                        <div class="mood-btn" data-mood="poor">
-                            <i class='bx bx-sad'></i>
+                        </button>
+                        <button class="mood-btn" data-mood="poor" aria-label="Mood: Poor">
+                            <i class="bx bx-sad"></i>
                             Poor
                             <span>Not feeling great</span>
-                        </div>
-                        <div class="mood-btn" data-mood="terrible">
-                            <i class='bx bx-sad'></i>
+                        </button>
+                        <button class="mood-btn" data-mood="terrible" aria-label="Mood: Terrible">
+                            <i class="bx bx-sad"></i>
                             Terrible
                             <span>Really struggling</span>
-                        </div>
+                        </button>
                     </div>
 
                     <div class="chart-container">
-                        <canvas id="mood-chart"></canvas>
+                        <canvas id="mood-chart" aria-label="Mood Chart"></canvas>
                     </div>
-                </div>
+                </section>
 
                 <!-- Resources Tab -->
-                <div class="tab-content" id="resources-tab">
-                    <h2 class="tab-title"><i class='bx bx-book'></i> Mental Health Resources</h2>
+                <section class="tab-content" id="resources-tab">
+                    <h2 class="tab-title"><i class="bx bx-book"></i> Mental Health Resources</h2>
                     <div class="motivational">"You are never alone in your journey! 🤝"</div>
                     <p>Access curated resources, tools, and professional support options.</p>
 
                     <div class="card-grid">
                         <div class="card">
                             <div class="card-header">
-                                <i class='bx bx-support'></i>
+                                <i class="bx bx-support"></i>
                                 Crisis Support
                             </div>
                             <div class="card-body">
                                 <div class="resource-item">
                                     <div class="resource-icon">
-                                        <i class='bx bx-phone'></i>
+                                        <i class="bx bx-phone"></i>
                                     </div>
                                     <div class="resource-content">
                                         <h3>Vandrevala Foundation</h3>
                                         <p>24/7 mental health helpline</p>
-                                        <a href="#">Call 9999666555 <i class='bx bx-right-arrow-alt'></i></a>
+                                        <a href="#" aria-label="Call Vandrevala Foundation">Call 9999666555 <i class="bx bx-right-arrow-alt"></i></a>
                                     </div>
                                 </div>
                                 <div class="resource-item">
                                     <div class="resource-icon">
-                                        <i class='bx bx-message'></i>
+                                        <i class="bx bx-message"></i>
                                     </div>
                                     <div class="resource-content">
                                         <h3>AASRA Suicide Prevention</h3>
                                         <p>24/7 crisis support</p>
-                                        <a href="#">Call +91-9820466726 <i class='bx bx-right-arrow-alt'></i></a>
+                                        <a href="#" aria-label="Call AASRA Suicide Prevention">Call +91-9820466726 <i class="bx bx-right-arrow-alt"></i></a>
                                     </div>
                                 </div>
                                 <div class="resource-item">
                                     <div class="resource-icon">
-                                        <i class='bx bx-globe'></i>
+                                        <i class="bx bx-globe"></i>
                                     </div>
                                     <div class="resource-content">
                                         <h3>iCall Helpline</h3>
                                         <p>Psychological support by TISS</p>
-                                        <a href="#">Call +91-9152987821 <i class='bx bx-right-arrow-alt'></i></a>
+                                        <a href="#" aria-label="Call iCall Helpline">Call +91-9152987821 <i class="bx bx-right-arrow-alt"></i></a>
                                     </div>
                                 </div>
                             </div>
@@ -1048,38 +1007,38 @@
 
                         <div class="card">
                             <div class="card-header">
-                                <i class='bx bx-book-open'></i>
+                                <i class="bx bx-book-open"></i>
                                 Self-Help Resources
                             </div>
                             <div class="card-body">
                                 <div class="resource-item">
                                     <div class="resource-icon">
-                                        <i class='bx bx-file'></i>
+                                        <i class="bx bx-file"></i>
                                     </div>
                                     <div class="resource-content">
                                         <h3>CBT Thought Diary</h3>
                                         <p>Track thoughts and challenge cognitive distortions</p>
-                                        <a href="#">Download Template <i class='bx bx-right-arrow-alt'></i></a>
+                                        <a href="#" aria-label="Download CBT Thought Diary">Download Template <i class="bx bx-right-arrow-alt"></i></a>
                                     </div>
                                 </div>
                                 <div class="resource-item">
                                     <div class="resource-icon">
-                                        <i class='bx bx-headphone'></i>
+                                        <i class="bx bx-headphone"></i>
                                     </div>
                                     <div class="resource-content">
                                         <h3>Guided Meditations</h3>
                                         <p>Mindfulness and relaxation exercises</p>
-                                        <a href="#">Listen Now <i class='bx bx-right-arrow-alt'></i></a>
+                                        <a href="#" aria-label="Listen to Guided Meditations">Listen Now <i class="bx bx-right-arrow-alt"></i></a>
                                     </div>
                                 </div>
                                 <div class="resource-item">
                                     <div class="resource-icon">
-                                        <i class='bx bx-video'></i>
+                                        <i class="bx bx-video"></i>
                                     </div>
                                     <div class="resource-content">
                                         <h3>Mental Health Webinars</h3>
                                         <p>Free educational sessions from experts</p>
-                                        <a href="#">View Schedule <i class='bx bx-right-arrow-alt'></i></a>
+                                        <a href="#" aria-label="View Mental Health Webinars Schedule">View Schedule <i class="bx bx-right-arrow-alt"></i></a>
                                     </div>
                                 </div>
                             </div>
@@ -1087,87 +1046,83 @@
 
                         <div class="card">
                             <div class="card-header">
-                                <i class='bx bx-health'></i>
+                                <i class="bx bx-health"></i>
                                 Professional Help
                             </div>
                             <div class="card-body">
                                 <div class="resource-item">
                                     <div class="resource-icon">
-                                        <i class='bx bx-search'></i>
+                                        <i class="bx bx-search"></i>
                                     </div>
                                     <div class="resource-content">
                                         <h3>Therapist Directory</h3>
                                         <p>Find licensed professionals near you</p>
-                                        <a href="#">Search Now <i class='bx bx-right-arrow-alt'></i></a>
+                                        <a href="#" aria-label="Search Therapist Directory">Search Now <i class="bx bx-right-arrow-alt"></i></a>
                                     </div>
                                 </div>
                                 <div class="resource-item">
                                     <div class="resource-icon">
-                                        <i class='bx bx-laptop'></i>
+                                        <i class="bx bx-laptop"></i>
                                     </div>
                                     <div class="resource-content">
                                         <h3>Online Therapy</h3>
                                         <p>Connect with therapists remotely</p>
-                                        <a href="#">Get Started <i class='bx bx-right-arrow-alt'></i></a>
+                                        <a href="#" aria-label="Start Online Therapy">Get Started <i class="bx bx-right-arrow-alt"></i></a>
                                     </div>
                                 </div>
                                 <div class="resource-item">
                                     <div class="resource-icon">
-                                        <i class='bx bx-group'></i>
+                                        <i class="bx bx-group"></i>
                                     </div>
                                     <div class="resource-content">
                                         <h3>Support Groups</h3>
                                         <p>Connect with others facing similar challenges</p>
-                                        <a href="#">Find Groups <i class='bx bx-right-arrow-alt'></i></a>
+                                        <a href="#" aria-label="Find Support Groups">Find Groups <i class="bx bx-right-arrow-alt"></i></a>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
+                </section>
 
                 <!-- Action Plan Tab -->
-                <div class="tab-content" id="plan-tab">
-                    <h2 class="tab-title"><i class='bx bx-task'></i> Personalized Action Plan</h2>
+                <section class="tab-content" id="plan-tab">
+                    <h2 class="tab-title"><i class="bx bx-task"></i> Personalized Action Plan</h2>
                     <div class="motivational">"Small steps today lead to big victories tomorrow! 🚀"</div>
                     <p>Your step-by-step plan to improve mental wellness based on our conversations.</p>
 
                     <div class="action-plan">
-                        <h3><i class='bx bx-task'></i> This Week's Goals</h3>
-
+                        <h3><i class="bx bx-task"></i> This Week's Goals</h3>
                         <div class="action-item">
-                            <div class="action-check">
-                                <i class='bx bx-check'></i>
+                            <div class="action-check" aria-label="Mark as completed">
+                                <i class="bx bx-check"></i>
                             </div>
                             <div class="action-text">
                                 <h4>Practice deep breathing</h4>
                                 <p>5 minutes of mindful breathing each morning</p>
                             </div>
                         </div>
-
                         <div class="action-item">
-                            <div class="action-check">
-                                <i class='bx bx-check'></i>
+                            <div class="action-check" aria-label="Mark as completed">
+                                <i class="bx bx-check"></i>
                             </div>
                             <div class="action-text">
                                 <h4>Connect with a friend</h4>
                                 <p>Reach out to someone you trust this week</p>
                             </div>
                         </div>
-
                         <div class="action-item">
-                            <div class="action-check">
-                                <i class='bx bx-check'></i>
+                            <div class="action-check" aria-label="Mark as completed">
+                                <i class="bx bx-check"></i>
                             </div>
                             <div class="action-text">
                                 <h4>Physical activity</h4>
                                 <p>20 minutes of movement at least 3 times this week</p>
                             </div>
                         </div>
-
                         <div class="action-item">
-                            <div class="action-check">
-                                <i class='bx bx-check'></i>
+                            <div class="action-check" aria-label="Mark as completed">
+                                <i class="bx bx-check"></i>
                             </div>
                             <div class="action-text">
                                 <h4>Gratitude journal</h4>
@@ -1177,34 +1132,32 @@
                     </div>
 
                     <div class="action-plan">
-                        <h3><i class='bx bx-book-open'></i> Recommended Resources</h3>
-
+                        <h3><i class="bx bx-book-open"></i> Recommended Resources</h3>
                         <div class="resource-item">
                             <div class="resource-icon">
-                                <i class='bx bx-book'></i>
+                                <i class="bx bx-book"></i>
                             </div>
                             <div class="resource-content">
                                 <h3>"Feeling Good" by Dr. David Burns</h3>
                                 <p>Cognitive behavioral therapy techniques for depression</p>
                             </div>
                         </div>
-
                         <div class="resource-item">
                             <div class="resource-icon">
-                                <i class='bx bx-headphone'></i>
+                                <i class="bx bx-headphone"></i>
                             </div>
                             <div class="resource-content">
                                 <h3>Anxiety Relief Meditation</h3>
                                 <p>15-minute guided session for immediate calm</p>
-                                <a href="#">Listen Now <i class='bx bx-right-arrow-alt'></i></a>
+                                <a href="#" aria-label="Listen to Anxiety Relief Meditation">Listen Now <i class="bx bx-right-arrow-alt"></i></a>
                             </div>
                         </div>
                     </div>
-                </div>
+                </section>
 
                 <!-- Emergency Tab -->
-                <div class="tab-content" id="emergency-tab">
-                    <h2 class="tab-title"><i class='bx bx-shield'></i> Emergency Support</h2>
+                <section class="tab-content" id="emergency-tab">
+                    <h2 class="tab-title"><i class="bx bx-shield"></i> Emergency Support</h2>
                     <div class="motivational">"You are enough, and help is always available! 💖"</div>
                     <p>Immediate resources and contacts for crisis situations.</p>
 
@@ -1216,7 +1169,7 @@
                     <div class="card-grid">
                         <div class="card">
                             <div class="card-header">
-                                <i class='bx bx-phone'></i>
+                                <i class="bx bx-phone"></i>
                                 Emergency Contacts
                             </div>
                             <div class="card-body">
@@ -1224,21 +1177,21 @@
                                     <div class="resource-content">
                                         <h3>Vandrevala Foundation</h3>
                                         <p>Call 9999666555</p>
-                                        <a href="#">vandrevalafoundation.com</a>
+                                        <a href="#" aria-label="Visit Vandrevala Foundation">vandrevalafoundation.com</a>
                                     </div>
                                 </div>
                                 <div class="resource-item">
                                     <div class="resource-content">
                                         <h3>AASRA Suicide Prevention</h3>
                                         <p>Call +91-9820466726</p>
-                                        <a href="#">aasra.info</a>
+                                        <a href="#" aria-label="Visit AASRA">aasra.info</a>
                                     </div>
                                 </div>
                                 <div class="resource-item">
                                     <div class="resource-content">
                                         <h3>iCall Helpline</h3>
                                         <p>Call +91-9152987821</p>
-                                        <a href="#">icallhelpline.org</a>
+                                        <a href="#" aria-label="Visit iCall Helpline">icallhelpline.org</a>
                                     </div>
                                 </div>
                             </div>
@@ -1246,7 +1199,7 @@
 
                         <div class="card">
                             <div class="card-header">
-                                <i class='bx bx-globe'></i>
+                                <i class="bx bx-globe"></i>
                                 Additional Resources
                             </div>
                             <div class="card-body">
@@ -1254,14 +1207,14 @@
                                     <div class="resource-content">
                                         <h3>Sangath</h3>
                                         <p>Mental health support services</p>
-                                        <a href="#">sangath.in</a>
+                                        <a href="#" aria-label="Visit Sangath">sangath.in</a>
                                     </div>
                                 </div>
                                 <div class="resource-item">
                                     <div class="resource-content">
                                         <h3>Mpower Helpline</h3>
                                         <p>Call 1800-120-820050</p>
-                                        <a href="#">mpower.org.in</a>
+                                        <a href="#" aria-label="Visit Mpower">mpower.org.in</a>
                                     </div>
                                 </div>
                             </div>
@@ -1271,19 +1224,19 @@
                     <div class="disclaimer">
                         <p><strong>Important:</strong> MindAid is not a substitute for professional mental health care. In crisis situations, please contact emergency services or a crisis hotline immediately.</p>
                     </div>
-                </div>
+                </section>
 
                 <!-- Feedback Tab -->
-                <div class="tab-content" id="feedback-tab">
-                    <h2 class="tab-title"><i class='bx bx-comment'></i> Feedback</h2>
+                <section class="tab-content" id="feedback-tab">
+                    <h2 class="tab-title"><i class="bx bx-comment"></i> Feedback</h2>
                     <div class="motivational">"Your feedback helps us grow and serve you better! 📝"</div>
                     <p>We value your input to improve MindAid Pro. Please share your thoughts below.</p>
 
-                    <form class="feedback-form" action="mailto:arnizz077@gmail.com?subject=MindAid%20Pro%20Feedback" method="POST" enctype="text/plain">
-                        <textarea id="feedback-text" name="body" placeholder="Share your feedback or suggestions..." required></textarea>
-                        <button type="submit">Submit Feedback</button>
-                    </form>
-                </div>
+                    <div class="feedback-form">
+                        <textarea id="feedback-text" placeholder="Share your feedback or suggestions..." required aria-label="Feedback"></textarea>
+                        <button id="feedback-submit" aria-label="Submit Feedback">Submit Feedback</button>
+                    </div>
+                </section>
             </div>
         </div>
 
@@ -1294,24 +1247,29 @@
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            let isAuthenticated = false;
-            let currentUser = null;
-            let currentLanguage = localStorage.getItem('language') || 'english';
-            const users = JSON.parse(localStorage.getItem('users')) || {};
-            const moodData = JSON.parse(localStorage.getItem('moodData')) || {};
+        (function () {
+            // State Management
+            let state = {
+                isAuthenticated: false,
+                currentUser: null,
+                currentLanguage: localStorage.getItem("language") || "english",
+                users: JSON.parse(localStorage.getItem("users")) || {},
+                moodData: JSON.parse(localStorage.getItem("moodData")) || {},
+                moodChart: null,
+            };
 
+            // Language Data
             const languageData = {
                 english: {
                     initialMessages: [
                         "Hi there! I'm MindAid, your mental health buddy. 🌟<br>How can I help you today?",
-                        "Feel free to type how you're feeling or use the quick buttons to get started. What's on your mind?"
+                        "Feel free to type how you're feeling or use the quick buttons to get started. What's on your mind?",
                     ],
                     quickReplies: [
                         { text: "I'm feeling anxious 😰", value: "I'm feeling anxious" },
                         { text: "I'm feeling low 😔", value: "I'm feeling low" },
                         { text: "I'm stressed out 😥", value: "I'm stressed out" },
-                        { text: "I need coping tips", value: "I need coping tips" }
+                        { text: "I need coping tips", value: "I need coping tips" },
                     ],
                     crisisResponse: "You're not alone, and help is here. Would you like assistance in reaching out to any of these resources?",
                     copingStrategies: {
@@ -1319,32 +1277,32 @@
                             "Try deep breathing: Inhale for 4 seconds, hold for 7, exhale for 8. Repeat 5 times. 🌬️",
                             "Use the 5-4-3-2-1 technique: Name 5 things you see, 4 you can touch, 3 you hear, 2 you smell, and 1 you taste. 👀",
                             "Take a short walk in a park or garden to clear your mind. 🌳",
-                            "Jot down your worries in a notebook to organize your thoughts. 📝"
+                            "Jot down your worries in a notebook to organize your thoughts. 📝",
                         ],
                         depression: [
                             "Reach out to a close friend or family member for a chat. 📞",
                             "Do something you enjoy, like listening to music or sketching, for 5 minutes. 🎶",
                             "Say kind words to yourself, like you would to a dear friend. 💖",
-                            "Set a small goal, like making a cup of tea or coffee. ☕"
+                            "Set a small goal, like making a cup of tea or coffee. ☕",
                         ],
                         stress: [
                             "Break your tasks into smaller steps. What's one thing you can do now? 📋",
                             "Try a 5-minute stretch to ease physical tension. 🤸",
                             "Make a quick to-do list to feel more in control. ✅",
-                            "Sip a calming drink like herbal tea to relax. 🍵"
+                            "Sip a calming drink like herbal tea to relax. 🍵",
                         ],
                         sleep: [
                             "Create a bedtime routine, like reading or drinking warm milk. 📖",
                             "Keep your room cool and cozy with soft bedding. 🛌",
                             "Skip caffeine after the afternoon. ☕",
-                            "Listen to calm music before sleeping. 🎶"
+                            "Listen to calm music before sleeping. 🎶",
                         ],
                         relationships: [
                             "Listen actively when talking to loved ones, without interrupting. 👂",
                             "Use 'I feel' statements to share your emotions clearly. 💬",
                             "Spend quality time with family or friends, like during meals. 🍽️",
-                            "Handle conflicts calmly, respecting everyone's views. 🤝"
-                        ]
+                            "Handle conflicts calmly, respecting everyone's views. 🤝",
+                        ],
                     },
                     responses: {
                         anxiety: "I hear you're feeling anxious. It's okay, we can work through this together. Want to try some calming techniques? 🌈",
@@ -1360,20 +1318,20 @@
                             "I appreciate you opening up. How's this affecting your day-to-day? 🗣️",
                             "I'm all ears. What's something else you want to talk about? 👂",
                             "Sounds like a lot. What do you think might help right now? 💭",
-                            "Let's figure this out together. What's next? 🚀"
-                        ]
-                    }
+                            "Let's figure this out together. What's next? 🚀",
+                        ],
+                    },
                 },
                 hinglish: {
                     initialMessages: [
                         "Namaste dost! Main hoon MindAid, tera mental health buddy. 🌸<br>Aaj kaisa feel kar raha hai, kya help chahiye?",
-                        "Jo bhi dil mein hai, type kar ya quick buttons se shuru kar. Kya chal raha hai, mujhe bata?"
+                        "Jo bhi dil mein hai, type kar ya quick buttons se shuru kar. Kya chal raha hai, mujhe bata?",
                     ],
                     quickReplies: [
                         { text: "Mujhe ghabrahat ho rahi hai 😰", value: "I'm feeling anxious" },
                         { text: "Dil thoda udaas hai 😔", value: "I'm feeling low" },
                         { text: "Bohot tension mein hoon 😥", value: "I'm stressed out" },
-                        { text: "Mujhe kuch tips do", value: "I need coping tips" }
+                        { text: "Mujhe kuch tips do", value: "I need coping tips" },
                     ],
                     crisisResponse: "Arre, tu bilkul akela nahi hai, yaar. In resources mein se kisi se baat karna chahega kya?",
                     copingStrategies: {
@@ -1381,32 +1339,32 @@
                             "Thoda sa deep breathing try kar: 4 second saans le, 7 second hold kar, 8 second saans chhod. 5 baar repeat kar. 🌬️",
                             "5-4-3-2-1 technique use kar: 5 cheezein dekh, 4 ko chhu, 3 sune, 2 smell kar, aur 1 taste kar. 👀",
                             "Park mein thodi der walk kar, dimag fresh ho jayega. 🌳",
-                            "Apne worries ko ek diary mein likh, dil halka ho jayega. 📝"
+                            "Apne worries ko ek diary mein likh, dil halka ho jayega. 📝",
                         ],
                         depression: [
                             "Kisi dost ya family wale se dil ki baat share kar. 📞",
                             "Kuch pasand ka kaam kar, jaise 5 minute ke liye gaana sun ya drawing kar. 🎶",
                             "Khud se pyar bhari baat kar, jaise ek dost se karta hai. 💖",
-                            "Ek chhota goal set kar, jaise chai ya coffee banani hai. ☕"
+                            "Ek chhota goal set kar, jaise chai ya coffee banani hai. ☕",
                         ],
                         stress: [
                             "Apne kaam ko chhote steps mein baant le. Abhi kya ek kaam ho sakta hai? 📋",
                             "5 minute ka stretch kar, body relax ho jayegi. 🤸",
                             "Ek chhoti to-do list bana, sab control mein lagega. ✅",
-                            "Thodi si herbal chai pi, thoda sukoon milega. 🍵"
+                            "Thodi si herbal chai pi, thoda sukoon milega. 🍵",
                         ],
                         sleep: [
                             "Raat ka ek routine bana, jaise kitab padh ya garam doodh pi. 📖",
                             "Apna room thanda aur cozy rakh, soft chadar daal ke. 🛌",
                             "Shaam ke baad chai ya coffee avoid kar. ☕",
-                            "Thoda soft music sun, neend aane mein madad hogi. 🎶"
+                            "Thoda soft music sun, neend aane mein madad hogi. 🎶",
                         ],
                         relationships: [
                             "Apne pyaron ke saath baat karte waqt poori dhyan se sun. 👂",
                             "'Mujhe aisa lagta hai' bolke apne feelings share kar. 💬",
                             "Family ya doston ke saath khana khaate waqt quality time spend kar. 🍽️",
-                            "Agar jhagda ho, to shaanti se baat kar, sabki izzat rakh ke. 🤝"
-                        ]
+                            "Agar jhagda ho, to shaanti se baat kar, sabki izzat rakh ke. 🤝",
+                        ],
                     },
                     responses: {
                         anxiety: "Arre, ghabrahat ho rahi hai? Koi baat nahi, hum saath mein handle kar lenge. Kuch calming tips try karein? 🌈",
@@ -1422,20 +1380,20 @@
                             "Teri baat sunke achha laga. Yeh roz ki zindagi pe kaisa asar daal raha hai? 🗣️",
                             "Main sun raha hoon. Aur kya baat karni hai? 👂",
                             "Thoda heavy lag raha hai. Abhi kya karna chahiye, kya sochta hai? 💭",
-                            "Chalo, saath mein iska kuch karte hain. Agla step kya hai? 🚀"
-                        ]
-                    }
+                            "Chalo, saath mein iska kuch karte hain. Agla step kya hai? 🚀",
+                        ],
+                    },
                 },
                 tanglish: {
                     initialMessages: [
                         "Vanakkam machi! Naan MindAid, un mental health dostu. 😊<br>Innaiku eppadi irukka, enna help venum?",
-                        "Manasula enna irukku, type pannu illa quick buttons press pannu. Enna nadakkuthu, sollu pa!"
+                        "Manasula enna irukku, type pannu illa quick buttons press pannu. Enna nadakkuthu, sollu pa!",
                     ],
                     quickReplies: [
                         { text: "Enakku bayama irukku 😰", value: "I'm feeling anxious" },
                         { text: "Manasu downa irukku 😔", value: "I'm feeling low" },
                         { text: "Romba pressurea irukku 😥", value: "I'm stressed out" },
-                        { text: "Konjam tips venum", value: "I need coping tips" }
+                        { text: "Konjam tips venum", value: "I need coping tips" },
                     ],
                     crisisResponse: "Machi, nee thaniya illa, namba irukkom. Intha resources-la yaarukittaiyavathu pesanuma?",
                     copingStrategies: {
@@ -1443,32 +1401,32 @@
                             "Deep breathing pannu: 4 seconds saans edu, 7 seconds hold pannu, 8 seconds velila vidu. 5 thadava pannu. 🌬️",
                             "5-4-3-2-1 technique try pannu: 5 paakuren, 4 thotturen, 3 ketkuren, 2 vaasanai pannuren, 1 taste pannuren. 👀",
                             "Park-la konjam nadanthu vaa, manasu konjam fresh aagum. 🌳",
-                            "Un tension-a notebook-la ezhuthu, konjam clear aagum da. 📝"
+                            "Un tension-a notebook-la ezhuthu, konjam clear aagum da. 📝",
                         ],
                         depression: [
                             "Nalla friend-a illa family-a konjam pesu, manasu light aagum. 📞",
                             "Unakku pudicha paattu kettu illa 5 minute sketch pannu, mood konjam maaraum. 🎶",
                             "Unna nee nalla friend maari encourage pannu, 'Nee super da' nu sollu. 💖",
-                            "Chinna goal vachuko, filter coffee pannurathu maari. ☕"
+                            "Chinna goal vachuko, filter coffee pannurathu maari. ☕",
                         ],
                         stress: [
                             "Vela-ya chinnachinna steps-a pannu. Ippo enna pannalam? 📋",
                             "5 minute stretch pannu, body relax aagum da. 🤸",
                             "Quick to-do list pannu, ellam control-la irukum. ✅",
-                            "Tulsi tea kudichu, konjam chill pannu. 🍵"
+                            "Tulsi tea kudichu, konjam chill pannu. 🍵",
                         ],
                         sleep: [
                             "Night routine pannu, paal kudichu illa konjam book padichu thoongu. 📖",
                             "Room-a cool-a vechuko, soft bed sheet podu. 🛌",
                             "Evening coffee illa tea kudikkaatha, thoonga mudiyum. ☕",
-                            "Soft Tamil paatu kettu, thoongurathukku munna. 🎶"
+                            "Soft Tamil paatu kettu, thoongurathukku munna. 🎶",
                         ],
                         relationships: [
                             "Pesumpo nalla ketu, friend-a illa family-a irunthaalum. 👂",
                             "'Enakku ippadi thonuthu' nu sollu, confusion varathu. 💬",
                             "Family illa friends kuda sapadu time-la nalla iru. 🍽️",
-                            "Problem na calm-a solve pannu, ellaroda feelings respect pannu. 🤝"
-                        ]
+                            "Problem na calm-a solve pannu, ellaroda feelings respect pannu. 🤝",
+                        ],
                     },
                     responses: {
                         anxiety: "Bayama irukku nu solra, sari da. Namma saathu paakalam. Konjam tips venuma? 🌈",
@@ -1484,448 +1442,327 @@
                             "Un baat kekka nalla irukku. Idhu daily life-a eppadi paathukuthu? 🗣️",
                             "Naan irukken, vera enna pesalam sollu? 👂",
                             "Konjam kastama irukku, aana manage pannalam. Next enna pannalam? 💭",
-                            "Vaa, saathu konjam ideas paakalam! 🚀"
-                        ]
-                    }
-                }
+                            "Vaa, saathu konjam ideas paakalam! 🚀",
+                        ],
+                    },
+                },
             };
 
-            // Show/hide containers
-            const authContainer = document.getElementById('auth-container');
-            const mainApp = document.getElementById('main-app');
-            const loginForm = document.getElementById('login-form');
-            const registerForm = document.getElementById('register-form');
-            const toggleToRegister = document.getElementById('toggle-to-register');
-            const toggleToLogin = document.getElementById('toggle-to-login');
-            const logoutBtn = document.getElementById('logout-btn');
-            const languageSelector = document.getElementById('language-selector');
-            const chatContainer = document.getElementById('chat-messages');
-            const quickRepliesContainer = document.getElementById('quick-replies');
+            // Crisis Detection
+            const crisisConfig = {
+                keywords: [
+                    "suicide",
+                    "kill myself",
+                    "end my life",
+                    "want to die",
+                    "harm myself",
+                    "self-harm",
+                    "hopeless",
+                    "no point",
+                    "give up",
+                    "cannot go on",
+                    "worthless",
+                ],
+                resources: [
+                    "Vandrevala Foundation: <strong>Call 9999666555</strong>",
+                    "AASRA Suicide Prevention: <strong>Call +91-9820466726</strong>",
+                    "iCall Helpline: <strong>Call +91-9152987821</strong>",
+                    "Mpower Emergency: <strong>Call 1800-120-820050</strong>",
+                    "Emergency Services: <strong>112</strong>",
+                ],
+            };
 
-            // Check if user is already logged in
-            if (localStorage.getItem('currentUser')) {
-                isAuthenticated = true;
-                currentUser = localStorage.getItem('currentUser');
-                authContainer.style.display = 'none';
-                mainApp.style.display = 'flex';
-            }
+            // DOM Elements
+            const elements = {
+                authContainer: document.getElementById("auth-container"),
+                mainApp: document.getElementById("main-app"),
+                loginForm: document.getElementById("login-form"),
+                registerForm: document.getElementById("register-form"),
+                toggleToRegister: document.getElementById("toggle-to-register"),
+                toggleToLogin: document.getElementById("toggle-to-login"),
+                logoutBtn: document.getElementById("logout-btn"),
+                languageSelector: document.getElementById("language-selector"),
+                chatContainer: document.getElementById("chat-messages"),
+                quickRepliesContainer: document.getElementById("quick-replies"),
+                userInput: document.getElementById("user-input"),
+                sendBtn: document.getElementById("send-btn"),
+                tabLinks: document.querySelectorAll(".nav-item"),
+                tabContents: document.querySelectorAll(".tab-content"),
+                moodButtons: document.querySelectorAll(".mood-btn"),
+                actionChecks: document.querySelectorAll(".action-check"),
+                feedbackSubmit: document.getElementById("feedback-submit"),
+                feedbackText: document.getElementById("feedback-text"),
+            };
 
-            // Set initial language
-            languageSelector.value = currentLanguage;
-            updateChatLanguage();
+            // Utility Functions
+            const utils = {
+                formatTime: (date) =>
+                    date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+                triggerConfetti: () =>
+                    confetti({
+                        particleCount: 100,
+                        spread: 70,
+                        origin: { y: 0.6 },
+                        colors: ["#ff6f91", "#a29bfe", "#feca57"],
+                    }),
+                triggerEmojiBurst: (container, emojis) => {
+                    for (let i = 0; i < 5; i++) {
+                        const emoji = document.createElement("span");
+                        emoji.classList.add("emoji-burst");
+                        emoji.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+                        emoji.style.left = `${Math.random() * 100}%`;
+                        emoji.style.top = `${Math.random() * 100}%`;
+                        container.appendChild(emoji);
+                    }
+                },
+                addMessage: (text, isUser = false) => {
+                    const messageDiv = document.createElement("div");
+                    messageDiv.classList.add("message", isUser ? "user-message" : "bot-message");
+                    const now = new Date();
+                    messageDiv.innerHTML = `${text}<span class="message-time">${utils.formatTime(now)}</span>`;
+                    elements.chatContainer.appendChild(messageDiv);
+                    elements.chatContainer.scrollTop = elements.chatContainer.scrollHeight;
+                },
+                showTyping: () => {
+                    const typingDiv = document.createElement("div");
+                    typingDiv.classList.add("typing-indicator");
+                    typingDiv.id = "typing-indicator";
+                    typingDiv.innerHTML = `
+                        <span class="typing-dot"></span>
+                        <span class="typing-dot"></span>
+                        <span class="typing-dot"></span>
+                    `;
+                    elements.chatContainer.appendChild(typingDiv);
+                    elements.chatContainer.scrollTop = elements.chatContainer.scrollHeight;
+                    return typingDiv;
+                },
+                hideTyping: () => {
+                    const typingIndicator = document.getElementById("typing-indicator");
+                    if (typingIndicator) typingIndicator.remove();
+                },
+            };
 
-            // Toggle between login and register forms
-            toggleToRegister.addEventListener('click', () => {
-                loginForm.style.display = 'none';
-                registerForm.style.display = 'flex';
-            });
-
-            toggleToLogin.addEventListener('click', () => {
-                loginForm.style.display = 'flex';
-                registerForm.style.display = 'none';
-            });
-
-            // Register
-            document.getElementById('register-btn').addEventListener('click', () => {
-                const email = document.getElementById('register-email').value;
-                const password = document.getElementById('register-password').value;
-                const confirmPassword = document.getElementById('confirm-password').value;
-
-                if (password !== confirmPassword) {
-                    alert('Passwords do not match!');
-                    return;
-                }
-
-                if (users[email]) {
-                    alert('User already exists!');
-                    return;
-                }
-
-                users[email] = { password, moods: [] };
-                localStorage.setItem('users', JSON.stringify(users));
-                alert('Registration successful! Please login.');
-                loginForm.style.display = 'flex';
-                registerForm.style.display = 'none';
-            });
-
-            // Login
-            document.getElementById('login-btn').addEventListener('click', () => {
-                const email = document.getElementById('login-email').value;
-                const password = document.getElementById('login-password').value;
-
-                if (users[email] && users[email].password === password) {
-                    isAuthenticated = true;
-                    currentUser = email;
-                    localStorage.setItem('currentUser', email);
-                    authContainer.style.display = 'none';
-                    mainApp.style.display = 'flex';
-                    initializeMoodChart();
-                    updateChatLanguage();
-                } else {
-                    alert('Invalid email or password!');
-                }
-            });
-
-            // Logout
-            logoutBtn.addEventListener('click', () => {
-                isAuthenticated = false;
-                currentUser = null;
-                localStorage.removeItem('currentUser');
-                authContainer.style.display = 'flex';
-                mainApp.style.display = 'none';
-                loginForm.style.display = 'flex';
-                registerForm.style.display = 'none';
-            });
-
-            // Language switcher
-            languageSelector.addEventListener('change', () => {
-                currentLanguage = languageSelector.value;
-                localStorage.setItem('language', currentLanguage);
-                updateChatLanguage();
-            });
-
-            // Update chat interface based on language
-            function updateChatLanguage() {
-                const lang = languageData[currentLanguage];
-                quickRepliesContainer.innerHTML = '';
-                lang.quickReplies.forEach(reply => {
-                    const button = document.createElement('button');
-                    button.classList.add('quick-reply');
-                    button.setAttribute('data-reply', reply.value);
-                    button.textContent = reply.text;
-                    quickRepliesContainer.appendChild(button);
-                });
-
-                // Update initial message
-                const initialMessageDiv = document.getElementById('initial-message');
-                const now = new Date();
-                const timeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-                initialMessageDiv.innerHTML = `${lang.initialMessages[0]}<span class="message-time">${timeString}</span>`;
-
-                // Re-attach quick reply listeners
-                document.querySelectorAll('.quick-reply').forEach(button => {
-                    button.addEventListener('click', function() {
-                        const reply = this.getAttribute('data-reply');
-                        addMessage(this.textContent, true);
-                        const typingIndicator = showTyping();
-                        generateResponse(reply);
-                    });
-                });
-            }
-
-            // Tab navigation
-            const tabLinks = document.querySelectorAll('.nav-item');
-            const tabContents = document.querySelectorAll('.tab-content');
-            
-            tabLinks.forEach(link => {
-                link.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    if (this.getAttribute('data-tab') === 'mood' && !isAuthenticated) {
-                        alert('Please login to access the Mood Tracker');
+            // Authentication
+            const auth = {
+                initialize: () => {
+                    if (localStorage.getItem("currentUser")) {
+                        state.isAuthenticated = true;
+                        state.currentUser = localStorage.getItem("currentUser");
+                        elements.authContainer.style.display = "none";
+                        elements.mainApp.style.display = "flex";
+                        utils.triggerConfetti();
+                        app.initializeMoodChart();
+                        app.updateChatLanguage();
+                    }
+                },
+                login: () => {
+                    const email = document.getElementById("login-email").value;
+                    const password = document.getElementById("login-password").value;
+                    if (state.users[email] && state.users[email].password === password) {
+                        state.isAuthenticated = true;
+                        state.currentUser = email;
+                        localStorage.setItem("currentUser", email);
+                        elements.authContainer.style.display = "none";
+                        elements.mainApp.style.display = "flex";
+                        app.initializeMoodChart();
+                        app.updateChatLanguage();
+                        utils.triggerConfetti();
+                    } else {
+                        alert("Invalid email or password!");
+                    }
+                },
+                register: () => {
+                    const email = document.getElementById("register-email").value;
+                    const password = document.getElementById("register-password").value;
+                    const confirmPassword = document.getElementById("confirm-password").value;
+                    if (password !== confirmPassword) {
+                        alert("Passwords do not match!");
                         return;
                     }
-                    
-                    const tabId = this.getAttribute('data-tab');
-                    tabLinks.forEach(l => l.classList.remove('active'));
-                    this.classList.add('active');
-                    tabContents.forEach(c => c.classList.remove('active'));
-                    document.getElementById(`${tabId}-tab`).classList.add('active');
-                });
-            });
-
-            // Mood tracker chart
-            let moodChart;
-            function initializeMoodChart() {
-                const moodCtx = document.getElementById('mood-chart').getContext('2d');
-                const userMoods = moodData[currentUser] || [];
-                const labels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-                const data = Array(7).fill(null);
-                
-                userMoods.forEach(mood => {
-                    const date = new Date(mood.date);
-                    const dayIndex = date.getDay() === 0 ? 6 : date.getDay() - 1;
-                    data[dayIndex] = mood.value;
-                });
-
-                moodChart = new Chart(moodCtx, {
-                    type: 'line',
-                    data: {
-                        labels,
-                        datasets: [{
-                            label: 'Mood Level',
-                            data,
-                            borderColor: '#4e73df',
-                            backgroundColor: 'rgba(78, 115, 223, 0.1)',
-                            borderWidth: 3,
-                            pointRadius: 6,
-                            pointBackgroundColor: '#4e73df',
-                            tension: 0.3,
-                            fill: true
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        scales: {
-                            y: {
-                                min: 1,
-                                max: 5,
-                                ticks: {
-                                    callback: function(value) {
-                                        const moods = ['Terrible', 'Poor', 'Neutral', 'Good', 'Excellent'];
-                                        return moods[value-1];
-                                    }
-                                }
-                            }
-                        },
-                        plugins: {
-                            legend: {
-                                display: false
-                            },
-                            tooltip: {
-                                callbacks: {
-                                    label: function(context) {
-                                        const moods = ['Terrible', 'Poor', 'Neutral', 'Good', 'Excellent'];
-                                        return context.parsed.y ? moods[context.parsed.y-1] : 'No data';
-                                    }
-                                }
-                            }
-                        }
-                    }
-                });
-            }
-
-            // Mood selection
-            const moodButtons = document.querySelectorAll('.mood-btn');
-            moodButtons.forEach(btn => {
-                btn.addEventListener('click', function() {
-                    if (!isAuthenticated) {
-                        alert('Please login to track your mood');
+                    if (state.users[email]) {
+                        alert("User already exists!");
                         return;
                     }
+                    state.users[email] = { password, moods: [] };
+                    localStorage.setItem("users", JSON.stringify(state.users));
+                    alert("Registration successful! Please login.");
+                    elements.loginForm.style.display = "flex";
+                    elements.registerForm.style.display = "none";
+                },
+                logout: () => {
+                    state.isAuthenticated = false;
+                    state.currentUser = null;
+                    localStorage.removeItem("currentUser");
+                    elements.authContainer.style.display = "flex";
+                    elements.mainApp.style.display = "none";
+                    elements.loginForm.style.display = "flex";
+                    elements.registerForm.style.display = "none";
+                },
+            };
 
-                    moodButtons.forEach(b => b.classList.remove('selected'));
-                    this.classList.add('selected');
-
-                    const moodLevels = {
-                        'terrible': 1,
-                        'poor': 2,
-                        'neutral': 3,
-                        'good': 4,
-                        'excellent': 5
-                    };
-                    const moodValue = moodLevels[this.getAttribute('data-mood')];
-                    const today = new Date();
-                    const dayIndex = today.getDay() === 0 ? 6 : today.getDay() - 1;
-
-                    if (!moodData[currentUser]) {
-                        moodData[currentUser] = [];
-                    }
-
-                    moodData[currentUser] = moodData[currentUser].filter(mood => {
-                        const moodDate = new Date(mood.date);
-                        return moodDate.toDateString() !== today.toDateString();
-                    });
-
-                    moodData[currentUser].push({
-                        date: today.toISOString(),
-                        value: moodValue
-                    });
-
-                    localStorage.setItem('moodData', JSON.stringify(moodData));
-
+            // Main App Logic
+            const app = {
+                initializeMoodChart: () => {
+                    const moodCtx = document.getElementById("mood-chart").getContext("2d");
+                    const userMoods = state.moodData[state.currentUser] || [];
+                    const labels = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
                     const data = Array(7).fill(null);
-                    moodData[currentUser].forEach(mood => {
+
+                    userMoods.forEach((mood) => {
                         const date = new Date(mood.date);
-                        const index = date.getDay() === 0 ? 6 : date.getDay() - 1;
-                        data[index] = mood.value;
+                        const dayIndex = date.getDay() === 0 ? 6 : date.getDay() - 1;
+                        data[dayIndex] = mood.value;
                     });
 
-                    moodChart.data.datasets[0].data = data;
-                    moodChart.update();
+                    state.moodChart = new Chart(moodCtx, {
+                        type: "line",
+                        data: {
+                            labels,
+                            datasets: [
+                                {
+                                    label: "Mood Level",
+                                    data,
+                                    borderColor: "#ff6f91",
+                                    backgroundColor: "rgba(255, 111, 145, 0.1)",
+                                    borderWidth: 3,
+                                    pointRadius: 6,
+                                    pointBackgroundColor: "#ff6f91",
+                                    tension: 0.3,
+                                    fill: true,
+                                },
+                            ],
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            scales: {
+                                y: {
+                                    min: 1,
+                                    max: 5,
+                                    ticks: {
+                                        callback: (value) => {
+                                            const moods = ["Terrible", "Poor", "Neutral", "Good", "Excellent"];
+                                            return moods[value - 1];
+                                        },
+                                    },
+                                },
+                            },
+                            plugins: {
+                                legend: { display: false },
+                                tooltip: {
+                                    callbacks: {
+                                        label: (context) => {
+                                            const moods = ["Terrible", "Poor", "Neutral", "Good", "Excellent"];
+                                            return context.parsed.y ? moods[context.parsed.y - 1] : "No data";
+                                        },
+                                    },
+                                },
+                            },
+                        },
+                    });
+                },
+                updateChatLanguage: () => {
+                    const lang = languageData[state.currentLanguage];
+                    elements.quickRepliesContainer.innerHTML = "";
+                    lang.quickReplies.forEach((reply) => {
+                        const button = document.createElement("button");
+                        button.classList.add("quick-reply");
+                        button.setAttribute("data-reply", reply.value);
+                        button.textContent = reply.text;
+                        button.setAttribute("aria-label", reply.text);
+                        elements.quickRepliesContainer.appendChild(button);
+                    });
 
-                    alert(`Thank you for tracking your mood! We've recorded that you're feeling ${this.getAttribute('data-mood')} today.`);
-                });
-            });
+                    const initialMessageDiv = document.getElementById("initial-message");
+                    const now = new Date();
+                    initialMessageDiv.innerHTML = `${lang.initialMessages[0]}<span class="message-time">${utils.formatTime(now)}</span>`;
 
-            // Action plan checkboxes
-            const actionChecks = document.querySelectorAll('.action-check');
-            actionChecks.forEach(check => {
-                check.addEventListener('click', function() {
-                    this.classList.toggle('checked');
-                });
-            });
+                    document.querySelectorAll(".quick-reply").forEach((button) => {
+                        button.addEventListener("click", function () {
+                            const reply = this.getAttribute("data-reply");
+                            utils.addMessage(this.textContent, true);
+                            const typingIndicator = utils.showTyping();
+                            chat.generateResponse(reply);
+                            utils.triggerEmojiBurst(elements.chatContainer, ["😊", "🌟", "💖"]);
+                        });
+                    });
+                },
+            };
 
-            // Chat functionality
-            const userInput = document.getElementById('user-input');
-            const sendBtn = document.getElementById('send-btn');
+            // Chat Logic
+            const chat = {
+                generateResponse: (userMessage) => {
+                    const lowerMsg = userMessage.toLowerCase();
+                    const lang = languageData[state.currentLanguage];
+                    const hasCrisis = crisisConfig.keywords.some((keyword) => lowerMsg.includes(keyword));
 
-            // Crisis keywords detection
-            const crisisKeywords = [
-                'suicide', 'kill myself', 'end my life', 'want to die',
-                'harm myself', 'self-harm', 'hopeless', 'no point',
-                'give up', 'cannot go on', 'worthless'
-            ];
-
-            // Emergency resources
-            const emergencyResources = [
-                "Vandrevala Foundation: <strong>Call 9999666555</strong>",
-                "AASRA Suicide Prevention: <strong>Call +91-9820466726</strong>",
-                "iCall Helpline: <strong>Call +91-9152987821</strong>",
-                "Mpower Emergency: <strong>Call 1800-120-820050</strong>",
-                "Emergency Services: <strong>112</strong>"
-            ];
-
-            // Add message to chat
-            function addMessage(text, isUser = false) {
-                const messageDiv = document.createElement('div');
-                messageDiv.classList.add('message');
-                messageDiv.classList.add(isUser ? 'user-message' : 'bot-message');
-                
-                const now = new Date();
-                const timeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-                
-                messageDiv.innerHTML = `${text}<span class="message-time">${timeString}</span>`;
-                chatContainer.appendChild(messageDiv);
-                chatContainer.scrollTop = chatContainer.scrollHeight;
-            }
-
-            // Show typing indicator
-            function showTyping() {
-                const typingDiv = document.createElement('div');
-                typingDiv.classList.add('typing-indicator');
-                typingDiv.id = 'typing-indicator';
-                typingDiv.innerHTML = `
-                    <span class="typing-dot"></span>
-                    <span class="typing-dot"></span>
-                    <span class="typing-dot"></span>
-                `;
-                chatContainer.appendChild(typingDiv);
-                chatContainer.scrollTop = chatContainer.scrollHeight;
-                return typingDiv;
-            }
-
-            // Remove typing indicator
-            function hideTyping() {
-                const typingIndicator = document.getElementById('typing-indicator');
-                if (typingIndicator) {
-                    typingIndicator.remove();
-                }
-            }
-
-            // Generate bot response
-            function generateResponse(userMessage) {
-                const lowerMsg = userMessage.toLowerCase();
-                const lang = languageData[currentLanguage];
-                
-                // Check for crisis keywords
-                const hasCrisis = crisisKeywords.some(keyword => lowerMsg.includes(keyword));
-                
-                if (hasCrisis) {
-                    setTimeout(() => {
-                        hideTyping();
-                        
-                        const alertDiv = document.createElement('div');
-                        alertDiv.classList.add('crisis-alert');
-                        alertDiv.innerHTML = `
-                            <strong>⚠️ Crisis Detected</strong><br>
-                            Your message suggests you might be in crisis. Please reach out to these resources immediately:
-                        `;
-                        
-                        const resourcesDiv = document.createElement('div');
-                        resourcesDiv.classList.add('resources-card');
-                        resourcesDiv.innerHTML = emergencyResources.join('<br />');
-                        
-                        chatContainer.appendChild(alertDiv);
-                        chatContainer.appendChild(resourcesDiv);
-                        chatContainer.scrollTop = chatContainer.scrollHeight;
-                        
+                    if (hasCrisis) {
                         setTimeout(() => {
-                            addMessage(lang.crisisResponse);
-                        }, 1000);
-                    }, 1500);
-                    return;
-                }
-                
-                // Generate appropriate response
-                setTimeout(() => {
-                    hideTyping();
-                    
-                    if (lowerMsg.includes('anxious') || lowerMsg.includes('anxiety') || lowerMsg.includes('panic') || lowerMsg.includes('tension')) {
-                        addMessage(lang.responses.anxiety);
-                        setTimeout(() => {
-                            const randomStrategy = lang.copingStrategies.anxiety[Math.floor(Math.random() * lang.copingStrategies.anxiety.length)];
-                            addMessage(`🌟 ${randomStrategy}`);
-                        }, 800);
-                    }
-                    else if (lowerMsg.includes('depress') || lowerMsg.includes('sad') || lowerMsg.includes('hopeless') || lowerMsg.includes('empty') || lowerMsg.includes('low') || lowerMsg.includes('down')) {
-                        addMessage(lang.responses.depression);
-                        setTimeout(() => {
-                            const randomStrategy = lang.copingStrategies.depression[Math.floor(Math.random() * lang.copingStrategies.depression.length)];
-                            addMessage(`🌈 ${randomStrategy}`);
-                        }, 800);
-                    }
-                    else if (lowerMsg.includes('overwhelm') || lowerMsg.includes('stress') || lowerMsg.includes('burnout')) {
-                        addMessage(lang.responses.stress);
-                        setTimeout(() => {
-                            const randomStrategy = lang.copingStrategies.stress[Math.floor(Math.random() * lang.copingStrategies.stress.length)];
-                            addMessage(`💪 ${randomStrategy}`);
-                        }, 800);
-                    }
-                    else if (lowerMsg.includes('sleep') || lowerMsg.includes('insomnia') || lowerMsg.includes('tired')) {
-                        addMessage(lang.responses.sleep);
-                        setTimeout(() => {
-                            const randomStrategy = lang.copingStrategies.sleep[Math.floor(Math.random() * lang.copingStrategies.sleep.length)];
-                            addMessage(`🌙 ${randomStrategy}`);
-                        }, 800);
-                    }
-                    else if (lowerMsg.includes('relation') || lowerMsg.includes('friend') || lowerMsg.includes('family') || lowerMsg.includes('partner')) {
-                        addMessage(lang.responses.relationships);
-                        setTimeout(() => {
-                            const randomStrategy = lang.copingStrategies.relationships[Math.floor(Math.random() * lang.copingStrategies.relationships.length)];
-                            addMessage(`🤝 ${randomStrategy}`);
-                        }, 800);
-                    }
-                    else if (lowerMsg.includes('cop') || lowerMsg.includes('strategies') || lowerMsg.includes('tip')) {
-                        addMessage(lang.responses.coping);
-                        setTimeout(() => {
-                            const anxietyStrategy = lang.copingStrategies.anxiety[Math.floor(Math.random() * lang.copingStrategies.anxiety.length)];
-                            const depressionStrategy = lang.copingStrategies.depression[Math.floor(Math.random() * lang.copingStrategies.depression.length)];
-                            const stressStrategy = lang.copingStrategies.stress[Math.floor(Math.random() * lang.copingStrategies.stress.length)];
-                            
-                            addMessage(`😰 ${anxietyStrategy}`);
+                            utils.hideTyping();
+                            const alertDiv = document.createElement("div");
+                            alertDiv.classList.add("crisis-alert");
+                            alertDiv.innerHTML = `
+                                <strong>⚠️ Crisis Detected</strong><br>
+                                Your message suggests you might be in crisis. Please reach out to these resources immediately:
+                            `;
+                            const resourcesDiv = document.createElement("div");
+                            resourcesDiv.classList.add("resources-card");
+                            resourcesDiv.innerHTML = crisisConfig.resources.join("<br />");
+                            elements.chatContainer.appendChild(alertDiv);
+                            elements.chatContainer.appendChild(resourcesDiv);
+                            elements.chatContainer.scrollTop = elements.chatContainer.scrollHeight;
+
                             setTimeout(() => {
-                                addMessage(`😔 ${depressionStrategy}`);
-                                setTimeout(() => {
-                                    addMessage(`😥 ${stressStrategy}`);
-                                }, 600);
-                            }, 600);
-                        }, 800);
+                                utils.addMessage(lang.crisisResponse);
+                            }, 1000);
+                        }, 1500);
+                        return;
                     }
-                    else if (lowerMsg.includes('thank') || lowerMsg.includes('appreciate') || lowerMsg.includes('helpful')) {
-                        addMessage(lang.responses.thanks);
-                        setTimeout(() => {
-                            addMessage(lang.responses.thanksFollowUp);
-                        }, 800);
-                    }
-                    else {
-                        const randomResponse = lang.responses.generic[Math.floor(Math.random() * lang.responses.generic.length)];
-                        addMessage(randomResponse);
-                    }
-                }, 1500 + Math.random() * 1000);
-            }
 
-            // Send message handler
-            function sendMessage() {
-                const message = userInput.value.trim();
-                if (message) {
-                    addMessage(message, true);
-                    userInput.value = '';
-                    
-                    const typingIndicator = showTyping();
-                    generateResponse(message);
-                }
-            }
+                    setTimeout(() => {
+                        utils.hideTyping();
+                        if (lowerMsg.includes("anxious") || lowerMsg.includes("ghabrahat") || lowerMsg.includes("bayama")) {
+                            utils.addMessage(lang.responses.anxiety);
+                            chat.sendCopingTips(lang.copingStrategies.anxiety, lang.responses);
+                        } else if (lowerMsg.includes("low") || lowerMsg.includes("udaas") || lowerMsg.includes("downa")) {
+                            utils.addMessage(lang.responses.depression);
+                            chat.sendCopingTips(lang.copingStrategies.depression, lang.responses);
+                        } else if (lowerMsg.includes("stress") || lowerMsg.includes("tension") || lowerMsg.includes("pressure")) {
+                            utils.addMessage(lang.responses.stress);
+                            chat.sendCopingTips(lang.copingStrategies.stress, lang.responses);
+                        } else if (lowerMsg.includes("sleep") || lowerMsg.includes("neend") || lowerMsg.includes("thoongala")) {
+                            utils.addMessage(lang.responses.sleep);
+                            chat.sendCopingTips(lang.copingStrategies.sleep, lang.responses);
+                        } else if (lowerMsg.includes("relationship") || lowerMsg.includes("rishton") || lowerMsg.includes("vishayam")) {
+                            utils.addMessage(lang.responses.relationships);
+                            chat.sendCopingTips(lang.copingStrategies.relationships, lang.responses);
+                        } else if (lowerMsg.includes("coping") || lowerMsg.includes("tips") || lowerMsg.includes("venum")) {
+                            utils.addMessage(lang.responses.coping);
+                            const allTips = Object.values(lang.copingStrategies).flat();
+                            const randomTips = allTips.sort(() => 0.5 - Math.random()).slice(0, 4);
+                            chat.sendCopingTips(randomTips, lang.responses);
+                        } else {
+                            const randomResponse = lang.responses.generic[Math.floor(Math.random() * lang.responses.generic.length)];
+                            utils.addMessage(randomResponse);
+                        }
+                    }, 1500);
+                },
+                sendCopingTips: (tips, responses) => {
+                    tips.forEach((tip, index) => {
+                        setTimeout(() => {
+                            utils.addMessage(tip);
+                            if (index === tips.length - 1) {
+                                setTimeout(() => {
+                                    utils.addMessage(responses.thanks);
+                                    setTimeout(() => {
+                                        utils.addMessage(responses.thanksFollowUp);
+                                    }, 1000);
+                                }, 1000);
+                            }
+                        }, index * 1000);
+                    });
+                },
+            };
 
             // Event listeners
             sendBtn.addEventListener('click', sendMessage);
