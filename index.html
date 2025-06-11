@@ -1248,710 +1248,908 @@
 
     <script>
         (function () {
-            // State Management
-            let state = {
-                isAuthenticated: false,
-                currentUser: null,
-                currentLanguage: localStorage.getItem("language") || "english",
-                users: JSON.parse(localStorage.getItem("users")) || {},
-                moodData: JSON.parse(localStorage.getItem("moodData")) || {},
-                moodChart: null,
-            };
+    // State Management
+    let state = {
+        isAuthenticated: false,
+        currentUser: null,
+        currentLanguage: localStorage.getItem("language") || "english",
+        users: JSON.parse(localStorage.getItem("users")) || {},
+        moodData: JSON.parse(localStorage.getItem("moodData")) || {},
+        moodChart: null,
+        conversationHistory: [], // Track user interactions in session
+        lastResponseType: null, // Prevent repetitive responses
+        streakCount: 0, // For gamifying mood logging
+    };
 
-            // Language Data
-           const languageData = {
-    english: {
-        initialMessages: [
-            "Hi there! I’m MindAid, your mental health companion. 🌟 It’s 10:28 PM—pretty late! How are you holding up tonight?",
-            "You can share anything on your mind, whether by typing or using the quick options. What’s going on?",
-        ],
-        quickReplies: [
-            { text: "I’m feeling anxious right now 😰", value: "anxiety" },
-            { text: "I’ve been feeling depressed lately 😔", value: "depression" },
-            { text: "I’m overwhelmed by stress 😥", value: "stress" },
-            { text: "I need some healthy coping ideas", value: "coping" },
-        ],
-        crisisResponse: "I’m really worried about you—you’re not alone, especially this late at night. Would you like me to share some support resources you can reach out to?",
-        copingStrategies: {
-            anxiety: [
-                "It’s late, so let’s try box breathing to calm your mind: inhale for 4 seconds, hold for 4, exhale for 4, pause for 4. Repeat until you feel calmer. 🌬️ Ready to give it a go?",
-                "Let’s ground ourselves with the 5-4-3-2-1 method: name 5 things you see, 4 you can touch, 3 you hear, 2 you smell, and 1 you taste. It helps ease anxious thoughts. 👀 Want to try?",
-                "A short walk outside, even just around your place, can lower stress hormones by up to 15%. Maybe some fresh night air could help? 🌳",
-                "Writing down your worries for 5 minutes can help clear your mind before bed. Want a prompt to start with? 📝",
+    // Language Data (Updated for 10:40 PM IST, June 11, 2025)
+    const languageData = {
+        english: {
+            initialMessages: [
+                "Hi there! I’m MindAid, your mental health companion. 🌟 It’s 10:40 PM on a Wednesday—hope you’re winding down! How are you feeling tonight?",
+                "Feel free to share anything on your mind, or use the quick options to get started. What’s up?",
             ],
-            depression: [
-                "Connecting with someone you trust can really help, even with a quick call or message. Who could you reach out to tonight? 📞",
-                "Let’s do something small you enjoy, like listening to a favorite song or sketching for 5 minutes. What sounds good? 🎶",
-                "Try saying something kind to yourself, like ‘I’m doing my best, and that’s enough.’ How does that feel? 💖",
-                "Small wins matter. How about making a warm drink to relax before bed? ☕",
+            quickReplies: [
+                { text: "I’m feeling anxious 😰", value: "anxiety" },
+                { text: "I’m feeling down 😔", value: "depression" },
+                { text: "I’m stressed out 😥", value: "stress" },
+                { text: "I can’t sleep 🌙", value: "sleep" },
+                { text: "I need coping ideas", value: "coping" },
             ],
-            stress: [
-                "Let’s break things down—what’s one thing that’s stressing you out the most right now? We can tackle it together. 📋",
-                "Progressive muscle relaxation can help you unwind before sleep. Want to try tensing and releasing each muscle group? 🤸",
-                "A ‘done list’ can make you feel accomplished. What are 3 things you’ve done today, even small ones? ✅",
-                "Chamomile tea can help you relax at this hour—it’s calming and sleep-friendly. Want to give it a try? 🍵",
-            ],
-            sleep: [
-                "Since it’s 10:28 PM, let’s set up a calming routine—maybe read a few pages or sip warm milk? 📖 What time do you want to sleep?",
-                "A cooler bedroom (around 60-67°F) can help you fall asleep faster by supporting melatonin production. 🛌",
-                "Caffeine can linger in your system for 6 hours—did you have any this evening that might be keeping you up? ☕",
-                "Soft nature sounds, like rain or waves, can help you drift off. Want a recommendation for a calming track? 🎶",
-            ],
-            relationships: [
-                "Active listening can make a big difference—try reflecting back what you hear to show you care. Want to practice? 👂",
-                "Use ‘I feel… when… because…’ to share your emotions clearly. Let’s try it with something on your mind. 💬",
-                "Spending quality time, like sharing a late-night snack, can strengthen bonds. Could you plan something small? 🍽️",
-                "Resolving conflicts quickly can ease tension—how can we address what’s bothering you tonight? 🤝",
-            ],
-        },
-        responses: {
-            anxiety: "I can tell you’re feeling anxious, which must be tough this late at night. Let’s try a grounding technique to help you relax—sound good? 🌈",
-            depression: "I’m sorry you’re feeling depressed—it can be so heavy. Let’s take it slow and find one small thing to help tonight. 💡",
-            stress: "Stress can feel overwhelming, especially at this hour. What’s been the biggest pressure for you today? Let’s work through it. 🤗",
-            sleep: "Struggling to sleep at 10:28 PM isn’t easy. Would you like some strategies to help you wind down? 🌙",
-            relationships: "Relationships can really affect how we feel. What’s been going on that you’d like to talk about? 💞",
-            coping: "Based on what you’ve shared, here are some strategies that might help you tonight: ✨",
-            thanks: "I’m so glad I could help! You’re doing great reaching out—want to keep exploring? 🌟",
-            thanksFollowUp: "I can share more ideas or resources if you’d like. What’s next for you? 📚",
-            generic: [
-                "Thanks for sharing—I’m here for you. How’s this affecting your evening? 🤔",
-                "I’m listening closely. What else should I know about how you’re feeling tonight? 🗣️",
-                "Let’s focus on what’s most important to you right now, especially this late. 👂",
-                "That sounds like a lot to handle. What would feel helpful for you tonight? 💭",
-                "Let’s find a small step you can take before bed—what feels manageable? 🚀",
-            ],
-            positiveSentiment: [
-                "You sound a bit brighter—that’s so great to hear! What’s lifting your spirits tonight? 😊",
-                "I’m picking up some positive vibes—love that! What’s been going well for you at this hour? 🥳",
-            ],
-            negativeSentiment: {
-                mild: "I can sense you’re not feeling your best tonight—I’m here to help. Want to talk more? 🥰",
-                severe: "I’m really sorry you’re feeling this way—it sounds so tough. Let’s find a way to ease things for you. 🤗",
-            },
-            followUp: {
-                anxiety: "Did that help calm your anxiety a bit, or should we try something else to relax tonight?",
-                depression: "How are you feeling now—any better? Want to try another small step to lift your mood?",
-                stress: "Is the stress feeling more manageable, or do you want to try another way to unwind before bed?",
-                sleep: "Are you feeling sleepier now, or do you need more ideas to help you rest?",
-                relationships: "Did that help at all, or would you like to talk more about what’s going on?",
-                generic: "How are you doing now? I’m here if you want to chat more or try something new. 😊",
-            },
-            proactive: {
-                anxiety: "I’ve noticed you’ve mentioned anxiety before—would you like to try a new technique tonight?",
-                depression: "You’ve seemed down lately—let’s find something to help you feel a bit better before bed.",
-                stress: "Stress has been coming up for you recently—want to try a new way to relax at this hour?",
-                sleep: "I remember you’ve had trouble sleeping before—shall we try something to help you tonight?",
-                relationships: "You’ve mentioned relationship challenges before—would you like to talk more about it now?",
-            },
-        },
-    },
-    hinglish: {
-        initialMessages: [
-            "Namaste! Main hoon MindAid, tera mental health dost. 🌸 Raat ke 10:28 ho gaye hain—tu kaisa hai abhi?",
-            "Yahan dil khol ke baat kar sakta hai—type karega ya quick options se shuru karega?",
-        ],
-        quickReplies: [
-            { text: "Abhi anxiety ho rahi hai 😰", value: "anxiety" },
-            { text: "Udaas feel kar raha hoon 😔", value: "depression" },
-            { text: "Bohot stress mein hoon 😥", value: "stress" },
-            { text: "Coping ke liye ideas chahiye", value: "coping" },
-        ],
-        crisisResponse: "Mujhe lagta hai tu mushkil mein hai—tu akela nahi hai, yaar. Main professional help ke options bata doon?",
-        copingStrategies: {
-            anxiety: [
-                "Raat ho gayi hai, toh box breathing try karein: 4 second saans le, 4 hold, 4 chhod, 4 pause. Repeat kar—thoda relax hoga. 🌬️ Shuru karein?",
-                "5-4-3-2-1 se dimag shant karte hain: 5 cheezein dekh, 4 chhu, 3 sun, 2 smell kar, 1 taste kar. Yeh anxiety kam karega. 👀 Try karein?",
-                "Thoda ghar ke bahar raat ki hawa mein ghoom aaye—stress hormones 15% tak kam ho sakte hain. Chalega? 🌳",
-                "5 minute ke liye apni chinta likh—sone se pehle dimag halka hoga. Topic chahiye? 📝",
-            ],
-            depression: [
-                "Kisi dost ya gharwale se baat kar—ek chhota sa call ya message bhi mood thik kar sakta hai. Kisse baat karega? 📞",
-                "Kuch pasand ka kar—jaise 5 minute ke liye gaana sun ya drawing kar. Kya achha lagega? 🎶",
-                "Khud se pyar wali baat bol: ‘Main apna best kar raha hoon, aur yeh kaafi hai.’ Kaisa laga? 💖",
-                "Chhoti si jeet bhi badi hoti hai—raat ke liye garam doodh banayein? ☕",
-            ],
-            stress: [
-                "Sabse bada stress kya de raha hai—usko chhote steps mein baant lete hain. Kya bolta hai? 📋",
-                "Muscle relaxation se body ko aaram do—har muscle ko tense aur release karte hain. Try karein? 🤸",
-                "‘Done list’ banayein—3 cheezein likho jo tune aaj kiya, chhoti hi sahi. Kya likhega? ✅",
-                "Chamomile chai raat ke liye perfect hai—tension kam karegi. Pi lega? 🍵",
-            ],
-            sleep: [
-                "Ab 10:28 ho gaye hain—ek relaxing routine banayein, jaise kitab padhein ya garam doodh piyein. Kab soega? 📖",
-                "Thanda kamra (16-20°C) neend ke liye behtar hai—melatonin production badhega. 🛌",
-                "Caffeine 6 ghante tak body mein rehta hai—shaam ko piya tha kya jo neend affect kar raha hai? ☕",
-                "Barish ya samundar ki awaaz sone mein madad kar sakti hai—koi track suggest karoon? 🎶",
-            ],
-            relationships: [
-                "Active listening se rishte behtar hote hain—jo sune, usko repeat karke confirm karo. Practice karein? 👂",
-                "‘Mujhe aisa lagta hai jab… kyunki…’ se apni baat clear bolo. Kisi baat pe try karein? 💬",
-                "Raat ka khana saath mein kha sakte ho—rishte majboot honge. Plan karein? 🍽️",
-                "Jhagda jaldi solve karna better hai—iss baat ko kaise handle karein? 🤝",
-            ],
-        },
-        responses: {
-            anxiety: "Teri anxiety samajh raha hoon—raat mein yeh aur tough lagta hai. Kuch grounding techniques try karein? 🌈",
-            depression: "Udaasi bohot bhari hoti hai—mujhe afsos hai. Aaj raat ek chhoti si cheez se shuru karein? 💡",
-            stress: "Stress raat ke waqt aur bhi zyada lagta hai. Sabse bada pressure kya hai—baat karein? 🤗",
-            sleep: "10:28 PM pe neend na aaye toh mushkil hai. Sone ke liye kuch tips try karein? 🌙",
-            relationships: "Rishton ka asar bohot hota hai dil pe. Kya chal raha hai—bata mujhe? 💞",
-            coping: "Jo tune bataya, uske hisab se yeh ideas raat ke liye kaam kar sakte hain: ✨",
-            thanks: "Tune baat share ki—bohot acha kiya! Aur kuch explore karein? 🌟",
-            thanksFollowUp: "Aur ideas ya resources dekhna hai kya—kya chahiye? 📚",
-            generic: [
-                "Baat batane ke liye shukriya—iss se teri raat pe kya asar pada? 🤔",
-                "Main dhyan se sun raha hoon—aur kya batana chahiye mujhe? 🗣️",
-                "Abhi raat mein kya sabse zyada matter kar raha hai tujhe? 👂",
-                "Yeh thoda heavy lag raha hai—raat ke liye kya help chahiye? 💭",
-                "Raat ke liye ek chhota step plan karein—kya theek lagega? 🚀",
-            ],
-            positiveSentiment: [
-                "Tu thoda khush lag raha hai—bohot acha hai! Raat ko kya tujhe khushi de raha hai? 😊",
-                "Achhe vibes aa rahe hain—mast hai! Is waqt kya acha chal raha hai? 🥳",
-            ],
-            negativeSentiment: {
-                mild: "Raat mein tu thoda down lag raha hai—main hoon na, baat karein? 🥰",
-                severe: "Bohot pareshan hai tu—mujhe bura lag raha hai. Raat ke liye kuch karte hain? 🤗",
-            },
-            followUp: {
-                anxiety: "Abhi thoda relax hua kya, ya raat ke liye kuch aur try karein?",
-                depression: "Mood thoda better hua kya, ya aur kuch karna hai aaj raat?",
-                stress: "Stress kam hua kya, ya sone se pehle kuch aur try karein?",
-                sleep: "Ab neend aa rahi hai kya, ya aur tips chahiye sone ke liye?",
-                relationships: "Kuch farak pada kya, ya aur baat karni hai iske bare mein?",
-                generic: "Ab kaisa lag raha hai? Aur baat karni hai ya kuch naya try karna hai? 😊",
-            },
-            proactive: {
-                anxiety: "Pehle bhi anxiety ki baat ki thi na—raat ke liye kuch naya try karein?",
-                depression: "Pehle bhi udaas laga tha—raat ke liye mood thik karne ka idea doon?",
-                stress: "Stress pehle bhi bola tha—abhi raat mein relax karne ka naya idea try karein?",
-                sleep: "Pehle bhi neend ki baat ki thi—abhi sone ke liye kuch aur try karein?",
-                relationships: "Rishton ke bare mein pehle bhi bola tha—abhi baat karein ya kuch karna hai?",
-            },
-        },
-    },
-    tanglish: {
-        initialMessages: [
-            "Vanakkam! Naan MindAid, un mental health dostu. 😊 Ippo raathiri 10:28 aagudhu—nee eppadi irukke?",
-            "Inga open-ah pesalam—type pannuviya illa quick options use pannuviya?",
-        ],
-        quickReplies: [
-            { text: "Ippo anxiety aagudhu 😰", value: "anxiety" },
-            { text: "Manasu downa irukku 😔", value: "depression" },
-            { text: "Romba stress aa irukku 😥", value: "stress" },
-            { text: "Coping ideas venum", value: "coping" },
-        ],
-        crisisResponse: "Ungalukku kashtama irukku nu puriyudhu—nee thaniya illa da. Professional help options connect pannava?",
-        copingStrategies: {
-            anxiety: [
-                "Raathiri aagiduchu, box breathing pannuvom: 4 seconds saans edu, 4 hold, 4 vidu, 4 pause. Repeat pannu—relax aagum. 🌬️ Start pannalama?",
-                "5-4-3-2-1 method try pannu: 5 paakuren, 4 thotturen, 3 ketkuren, 2 smell pannuren, 1 taste pannuren. Anxiety kammi aagum. 👀 Pannuviya?",
-                "Veedu pakkathula raathiri hawa-la nadanthu vaa—stress hormones 15% kammi aagum. Try pannuviya? 🌳",
-                "5 minute ezhuthi paaru—thoongaradhukku munna mind clear aagum. Topic venuma? 📝",
-            ],
-            depression: [
-                "Nambikkai ulla friend-a illa family-a konjam pesu—chumma message pannina kooda mood maaraum. Yaarukku message pannuviya? 📞",
-                "Unakku pudicha 5 minute activity pannu—paattu kekkuriaya illa drawing pannuviya? Enna pannalam? 🎶",
-                "Nee unna ‘Naan try pannuren, adhu podhum’ nu sollunga. Eppadi irukku? 💖",
-                "Chinna vishayam pannuvom—raathiri paal heat pannuviya? ☕",
-            ],
-            stress: [
-                "Enna stress romba irukku—adha chinnachinna steps-a pannuvom. Enna pannalam? 📋",
-                "Muscle relaxation pannina body relax aagum—muscles-a tense pannitu release pannuvom. Try pannuviya? 🤸",
-                "‘Done list’ ezhuthuvom—3 vishayam innaiku pannirukke, ezhuthu paakalam. Enna ezhuthuviya? ✅",
-                "Chamomile tea raathiri nalla irukum—tension kammi aagum. Kudichu paakuriaya? 🍵",
-            ],
-            sleep: [
-                "Ippo 10:28 aagudhu—calming routine pannuvom, paal kudichu illa book padichu thoonguviya? Eppadi thoonguviya? 📖",
-                "Cool room (16-20°C) thoongarathukku help pannum—melatonin production perugum. 🛌",
-                "Caffeine 6 hours body-la irukum—evening coffee/tea affect pannudhuya? ☕",
-                "Western Ghats rain sound kettu thoongalam—thoongarathukku help aagum. Track venuma? 🎶",
-            ],
-            relationships: [
-                "Active listening pannina rishte nalla irukum—ketta pinadi repeat panni confirm pannu. Practice pannuviya? 👂",
-                "‘Enakku ippadi thonudhu appadiyae…’ nu solli clear-a pesuvom. Try pannuviya? 💬",
-                "Raathiri sapadu saathu saapidalam—relationship strong aagum. Plan pannuviya? 🍽️",
-                "Jhagda jaldi solve pannina nalladhu—idha eppadi handle pannalam? 🤝",
-            ],
-        },
-        responses: {
-            anxiety: "Raathiri anxiety aagudhu nu puriyudhu—kashtama irukum. Grounding techniques pannuvoma? 🌈",
-            depression: "Manasu downa irukku—adhu heavy-a irukum da. Innaiku raathiri konjam help pannuvoma? 💡",
-            stress: "Stress raathiri romba feel aagum—enna main pressure, pesuvoma? 🤗",
-            sleep: "10:28 PM aagiduchu—thoongaradhu kashtam. Thoongarathukku tips try pannuviya? 🌙",
-            relationships: "Rishte manasula romba impact pannum—enna nadakkudhu, sollu paakalam? 💞",
-            coping: "Nee solradha paatha, intha ideas raathiri unakku help pannum: ✨",
-            thanks: "Nee share pannirukke—romba nalladhu! Innum explore pannuviya? 🌟",
-            thanksFollowUp: "Innum ideas illa resources paaklama—enna venum? 📚",
-            generic: [
-                "Share pannirukke, nandri—idhu un raathiri eppadi affect pannudhu? 🤔",
-                "Naan ketkuren—innum enna purinjukka venum? 🗣️",
-                "Raathiri unakku enna mukkiyam aagudhu? 👂",
-                "Idhu konjam kashtama irukku—raathiri enna help venum? 💭",
-                "Raathiri konjam plan pannuvom—enna pannuviya? 🚀",
-            ],
-            positiveSentiment: [
-                "Nee konjam happy-a irukke—super da! Raathiri enna unakku santhoshama irukku? 😊",
-                "Nalla vibe-a irukke—mast! Ippo enna nalladhu nadakkudhu? 🥳",
-            ],
-            negativeSentiment: {
-                mild: "Raathiri konjam down-a irukke—naan irukken, pesuvoma? 🥰",
-                severe: "Romba kashtama irukku nu puriyudhu—sorry da. Raathiri konjam help pannuvoma? 🤗",
-            },
-            followUp: {
-                anxiety: "Ippo anxiety konjam kammi aacha, illa raathiri vera pannuvoma?",
-                depression: "Mood konjam maariyacha, illa innaiku raathiri vera pannuvoma?",
-                stress: "Stress kammi aacha, illa thoongaradhukku munna vera try pannuvoma?",
-                sleep: "Ippo thoongalam nu thonudha, illa innum tips venuma?",
-                relationships: "Idhu help pannucha, illa innum pesanuma idhpathi?",
-                generic: "Ippo eppadi irukke? Innum pesanuma illa vera pannanuma? 😊",
-            },
-            proactive: {
-                anxiety: "Munnadiyum anxiety pathi sonniya—raathiri konjam vera try pannuvoma?",
-                depression: "Munnadiyum manasu down-nu sonniya—raathiri mood maara idea venuma?",
-                stress: "Munnadiyum stress pathi sonniya—raathiri relax pannurathukku idea paaklama?",
-                sleep: "Munnadiyum thoongala nu sonniya—ippo thoongarathukku help pannuvoma?",
-                relationships: "Munnadiyum rishte pathi sonniya—ippo pesanuma illa vera pannanuma?",
-            },
-        },
-    },
-};
-
-            // Crisis Detection
-            const crisisConfig = {
-                keywords: [
-                    "suicide",
-                    "kill myself",
-                    "end my life",
-                    "want to die",
-                    "harm myself",
-                    "self-harm",
-                    "hopeless",
-                    "no point",
-                    "give up",
-                    "cannot go on",
-                    "worthless",
+            crisisResponse: "I’m really concerned for you—it’s late, and you’re not alone. Would you like to connect with a support resource right now?",
+            copingStrategies: {
+                anxiety: [
+                    "Since it’s late, let’s try box breathing to calm your mind: inhale for 4 seconds, hold for 4, exhale for 4, pause for 4. Repeat 5 times. 🌬️ Ready to do this together?",
+                    "The 5-4-3-2-1 grounding method can help: name 5 things you see, 4 you can touch, 3 you hear, 2 you smell, and 1 you taste. It eases anxious thoughts. 👀 Want to try?",
+                    "A short walk outside, even just around your place, can lower stress hormones by up to 15%. Some fresh night air might help—up for it? 🌳",
+                    "Writing down your worries for 5 minutes can clear your mind before bed. I can give you a prompt if you’d like! 📝",
                 ],
-                resources: [
-                    "Vandrevala Foundation: <strong>Call 9999666555</strong>",
-                    "AASRA Suicide Prevention: <strong>Call +91-9820466726</strong>",
-                    "iCall Helpline: <strong>Call +91-9152987821</strong>",
-                    "Mpower Emergency: <strong>Call 1800-120-820050</strong>",
-                    "Emergency Services: <strong>112</strong>",
+                depression: [
+                    "Connecting with someone you trust can lift your spirits, even with a quick message. Who could you reach out to tonight? 📞",
+                    "Let’s do something small you enjoy, like listening to a calming song or sketching for 5 minutes. What sounds nice? 🎶",
+                    "Try saying something kind to yourself, like ‘I’m doing my best, and that’s enough.’ How does that feel? 💖",
+                    "Small wins matter, especially at night. How about making a warm drink to relax? ☕",
                 ],
-            };
+                stress: [
+                    "Let’s break it down—what’s stressing you out the most right now? We can tackle it together, one step at a time. 📋",
+                    "Progressive muscle relaxation can help you unwind before bed. Want to try tensing and releasing each muscle group? 🤸",
+                    "A ‘done list’ can make you feel accomplished. What are 3 things you’ve done today, even small ones? ✅",
+                    "Chamomile tea is perfect for late-night relaxation—it can ease tension. Want to give it a try? 🍵",
+                ],
+                sleep: [
+                    "It’s 10:40 PM, so let’s set up a calming routine—maybe read a few pages or sip warm milk? 📖 What time do you want to sleep?",
+                    "A cooler bedroom (around 60-67°F) can help you fall asleep faster by boosting melatonin production. 🛌",
+                    "Caffeine can linger in your system for 6 hours—did you have any this evening that might be keeping you up? ☕",
+                    "Soft nature sounds, like rain or waves, can help you drift off. Want a recommendation for a calming track? 🎶",
+                ],
+                relationships: [
+                    "Active listening can strengthen bonds—try reflecting back what you hear to show you care. Want to practice? 👂",
+                    "Use ‘I feel… when… because…’ to express yourself clearly. Let’s try it with something on your mind. 💬",
+                    "Spending quality time, like sharing a late-night snack, can bring you closer. Could you plan something small? 🍽️",
+                    "Resolving conflicts quickly can ease tension—how can we address what’s bothering you tonight? 🤝",
+                ],
+            },
+            responses: {
+                anxiety: "I can tell you’re feeling anxious, which can be tough this late at night. Let’s find a way to help you relax—how about a grounding technique? 🌈",
+                depression: "I’m sorry you’re feeling down—it can be so heavy. Let’s take it slow and find something small to help tonight. 💡",
+                stress: "Stress can feel overwhelming, especially at 10:40 PM. What’s been the biggest pressure for you today? Let’s work through it. 🤗",
+                sleep: "Struggling to sleep at this hour isn’t easy. Would you like some tips to help you wind down for the night? 🌙",
+                relationships: "Relationships can really affect how we feel. What’s been going on that you’d like to share? 💞",
+                coping: "Here are some strategies that might help you tonight, based on what you’ve shared: ✨",
+                thanks: "I’m so glad I could help! You’re doing great by reaching out—want to explore more? 🌟",
+                thanksFollowUp: "I can share more ideas or resources if you’d like. What’s next for you tonight? 📚",
+                generic: [
+                    "Thanks for sharing—I’m here for you. How’s this affecting your evening? 🤔",
+                    "I’m listening closely. What else should I know about how you’re feeling tonight? 🗣️",
+                    "Let’s focus on what’s most important to you right now, especially this late. 👂",
+                    "That sounds like a lot to handle. What would feel helpful for you tonight? 💭",
+                    "Let’s find a small step you can take before bed—what feels manageable? 🚀",
+                ],
+                positiveSentiment: [
+                    "You sound a bit brighter—that’s so great to hear! What’s lifting your spirits tonight? 😊",
+                    "I’m picking up some positive vibes—love that! What’s been going well for you at this hour? 🥳",
+                ],
+                negativeSentiment: {
+                    mild: "I can sense you’re not feeling your best tonight—I’m here to help. Want to talk more? 🥰",
+                    severe: "I’m really sorry you’re feeling this way—it sounds so tough. Let’s find a way to ease things for you. 🤗",
+                },
+                followUp: {
+                    anxiety: "Did that help calm your anxiety a bit, or should we try something else to relax tonight?",
+                    depression: "How are you feeling now—any better? Want to try another small step to lift your mood?",
+                    stress: "Is the stress feeling more manageable, or do you want to try another way to unwind before bed?",
+                    sleep: "Are you feeling sleepier now, or do you need more ideas to help you rest?",
+                    relationships: "Did that help at all, or would you like to talk more about what’s going on?",
+                    generic: "How are you doing now? I’m here if you want to chat more or try something new. 😊",
+                },
+                proactive: {
+                    anxiety: "I’ve noticed you’ve mentioned anxiety a few times—would you like to try a new technique tonight?",
+                    depression: "You’ve seemed down lately—let’s find something to help you feel a bit better before bed.",
+                    stress: "Stress has been coming up for you recently—want to try a new way to relax at this hour?",
+                    sleep: "I remember you’ve had trouble sleeping before—shall we try something to help you tonight?",
+                    relationships: "You’ve mentioned relationship challenges before—would you like to talk more about it now?",
+                },
+            },
+        },
+        hinglish: {
+            initialMessages: [
+                "Namaste! Main hoon MindAid, tera mental health dost. 🌸 Raat ke 10:40 ho gaye hain, Wednesday hai—tu kaisa hai abhi?",
+                "Yahan dil khol ke baat kar sakta hai—type karega ya quick options se shuru karega?",
+            ],
+            quickReplies: [
+                { text: "Abhi anxiety ho rahi hai 😰", value: "anxiety" },
+                { text: "Udaas feel kar raha hoon 😔", value: "depression" },
+                { text: "Bohot stress mein hoon 😥", value: "stress" },
+                { text: "Neend nahi aa rahi 🌙", value: "sleep" },
+                { text: "Coping ke liye ideas chahiye", value: "coping" },
+            ],
+            crisisResponse: "Mujhe lagta hai tu mushkil mein hai—tu akela nahi hai, yaar. Raat mein help ke liye kuch options bata doon?",
+            copingStrategies: {
+                anxiety: [
+                    "Raat ho gayi hai, toh box breathing try karein: 4 second saans le, 4 hold, 4 chhod, 4 pause. 5 baar repeat kar—thoda relax hoga. 🌬️ Saath mein karein?",
+                    "5-4-3-2-1 se dimag shant karte hain: 5 cheezein dekh, 4 chhu, 3 sun, 2 smell kar, 1 taste kar. Yeh anxiety kam karega. 👀 Try karein?",
+                    "Thoda ghar ke bahar raat ki hawa mein ghoom aaye—stress hormones 15% tak kam ho sakte hain. Chalega? 🌳",
+                    "5 minute ke liye apni chinta likh—sone se pehle dimag halka hoga. Topic chahiye? 📝",
+                ],
+                depression: [
+                    "Kisi dost ya gharwale se baat kar—ek chhota sa message bhi mood thik kar sakta hai. Kisse baat karega? 📞",
+                    "Kuch pasand ka kar—jaise 5 minute ke liye gaana sun ya drawing kar. Kya achha lagega? 🎶",
+                    "Khud se pyar wali baat bol: ‘Main apna best kar raha hoon, aur yeh kaafi hai.’ Kaisa laga? 💖",
+                    "Chhoti si jeet bhi badi hoti hai—raat ke liye garam doodh banayein? ☕",
+                ],
+                stress: [
+                    "Sabse bada stress kya de raha hai—usko chhote steps mein baant lete hain. Kya bolta hai? 📋",
+                    "Muscle relaxation se body ko aaram do—har muscle ko tense aur release karte hain. Try karein? 🤸",
+                    "‘Done list’ banayein—3 cheezein likho jo tune aaj kiya, chhoti hi sahi. Kya likhega? ✅",
+                    "Chamomile chai raat ke liye perfect hai—tension kam karegi. Pi lega? 🍵",
+                ],
+                sleep: [
+                    "Ab 10:40 ho gaye hain—ek relaxing routine banayein, jaise kitab padhein ya garam doodh piyein. Kab soega? 📖",
+                    "Thanda kamra (16-20°C) neend ke liye behtar hai—melatonin production badhega. 🛌",
+                    "Caffeine 6 ghante tak body mein rehta hai—shaam ko piya tha kya jo neend affect kar raha hai? ☕",
+                    "Barish ya samundar ki awaaz sone mein madad kar sakti hai—koi track suggest karoon? 🎶",
+                ],
+                relationships: [
+                    "Active listening se rishte behtar hote hain—jo sune, usko repeat karke confirm karo. Practice karein? 👂",
+                    "‘Mujhe aisa lagta hai jab… kyunki…’ se apni baat clear bolo. Kisi baat pe try karein? 💬",
+                    "Raat ka khana saath mein kha sakte ho—rishte majboot honge. Plan karein? 🍽️",
+                    "Jhagda jaldi solve karna better hai—iss baat ko kaise handle karein? 🤝",
+                ],
+            },
+            responses: {
+                anxiety: "Teri anxiety samajh raha hoon—raat ke 10:40 pe yeh aur tough lagta hai. Kuch relaxing try karein? 🌈",
+                depression: "Udaasi bohot bhari hoti hai—mujhe afsos hai. Aaj raat ek chhoti si cheez se shuru karein? 💡",
+                stress: "Stress raat ke waqt aur bhi zyada lagta hai. Sabse bada pressure kya hai—baat karein? 🤗",
+                sleep: "10:40 PM pe neend na aaye toh mushkil hai. Sone ke liye kuch tips try karein? 🌙",
+                relationships: "Rishton ka asar bohot hota hai dil pe. Kya chal raha hai—bata mujhe? 💞",
+                coping: "Jo tune bataya, uske hisab se yeh ideas raat ke liye kaam kar sakte hain: ✨",
+                thanks: "Tune baat share ki—bohot acha kiya! Aur kuch explore karein? 🌟",
+                thanksFollowUp: "Aur ideas ya resources dekhna hai kya—kya chahiye? 📚",
+                generic: [
+                    "Baat batane ke liye shukriya—iss se teri raat pe kya asar pada? 🤔",
+                    "Main dhyan se sun raha hoon—aur kya batana chahiye mujhe? 🗣️",
+                    "Abhi raat mein kya sabse zyada matter kar raha hai tujhe? 👂",
+                    "Yeh thoda heavy lag raha hai—raat ke liye kya help chahiye? 💭",
+                    "Raat ke liye ek chhota step plan karein—kya theek lagega? 🚀",
+                ],
+                positiveSentiment: [
+                    "Tu thoda khush lag raha hai—bohot acha hai! Raat ko kya tujhe khushi de raha hai? 😊",
+                    "Achhe vibes aa rahe hain—mast hai! Is waqt kya acha chal raha hai? 🥳",
+                ],
+                negativeSentiment: {
+                    mild: "Raat mein tu thoda down lag raha hai—main hoon na, baat karein? 🥰",
+                    severe: "Bohot pareshan hai tu—mujhe bura lag raha hai. Raat ke liye kuch karte hain? 🤗",
+                },
+                followUp: {
+                    anxiety: "Abhi thoda relax hua kya, ya raat ke liye kuch aur try karein?",
+                    depression: "Mood thoda better hua kya, ya aur kuch karna hai aaj raat?",
+                    stress: "Stress kam hua kya, ya sone se pehle kuch aur try karein?",
+                    sleep: "Ab neend aa rahi hai kya, ya aur tips chahiye sone ke liye?",
+                    relationships: "Kuch farak pada kya, ya aur baat karni hai iske bare mein?",
+                    generic: "Ab kaisa lag raha hai? Aur baat karni hai ya kuch naya try karna hai? 😊",
+                },
+                proactive: {
+                    anxiety: "Pehle bhi anxiety ki baat ki thi na—raat ke liye kuch naya try karein?",
+                    depression: "Pehle bhi udaas laga tha—raat ke liye mood thik karne ka idea doon?",
+                    stress: "Stress pehle bhi bola tha—abhi raat mein relax karne ka naya idea try karein?",
+                    sleep: "Pehle bhi neend ki baat ki thi—abhi sone ke liye kuch aur try karein?",
+                    relationships: "Rishton ke bare mein pehle bhi bola tha—abhi baat karein ya kuch karna hai?",
+                },
+            },
+        },
+        tanglish: {
+            initialMessages: [
+                "Vanakkam! Naan MindAid, un mental health dostu. 😊 Ippo raathiri 10:40 aagudhu, Budhan kizhamai—nee eppadi irukke?",
+                "Inga open-ah pesalam—type pannuviya illa quick options use pannuviya?",
+            ],
+            quickReplies: [
+                { text: "Ippo anxiety aagudhu 😰", value: "anxiety" },
+                { text: "Manasu downa irukku 😔", value: "depression" },
+                { text: "Romba stress aa irukku 😥", value: "stress" },
+                { text: "Thoongamudiyala 🌙", value: "sleep" },
+                { text: "Coping ideas venum", value: "coping" },
+            ],
+            crisisResponse: "Ungalukku kashtama irukku nu puriyudhu—nee thaniya illa da. Raathiri help pannava, options sollava?",
+            copingStrategies: {
+                anxiety: [
+                    "Raathiri aagiduchu, box breathing pannuvom: 4 seconds saans edu, 4 hold, 4 vidu, 4 pause. 5 thadava pannu—relax aagum. 🌬️ Saathu pannuvoma?",
+                    "5-4-3-2-1 method try pannu: 5 paakuren, 4 thotturen, 3 ketkuren, 2 smell pannuren, 1 taste pannuren. Anxiety kammi aagum. 👀 Pannuviya?",
+                    "Veedu pakkathula raathiri hawa-la nadanthu vaa—stress hormones 15% kammi aagum. Try pannuviya? 🌳",
+                    "5 minute ezhuthi paaru—thoongaradhukku munna mind clear aagum. Topic venuma? 📝",
+                ],
+                depression: [
+                    "Nambikkai ulla friend-a illa family-a konjam pesu—chumma message pannina kooda mood maaraum. Yaarukku message pannuviya? 📞",
+                    "Unakku pudicha 5 minute activity pannu—paattu kekkuriaya illa drawing pannuviya? Enna pannalam? 🎶",
+                    "Nee unna ‘Naan try pannuren, adhu podhum’ nu sollunga. Eppadi irukku? 💖",
+                    "Chinna vishayam pannuvom—raathiri paal heat pannuviya? ☕",
+                ],
+                stress: [
+                    "Enna stress romba irukku—adha chinnachinna steps-a pannuvom. Enna pannalam? 📋",
+                    "Muscle relaxation pannina body relax aagum—muscles-a tense pannitu release pannuvom. Try pannuviya? 🤸",
+                    "‘Done list’ ezhuthuvom—3 vishayam innaiku pannirukke, ezhuthu paakalam. Enna ezhuthuviya? ✅",
+                    "Chamomile tea raathiri nalla irukum—tension kammi aagum. Kudichu paakuriaya? 🍵",
+                ],
+                sleep: [
+                    "Ippo 10:40 aagudhu—calming routine pannuvom, paal kudichu illa book padichu thoonguviya? Eppadi thoonguviya? 📖",
+                    "Cool room (16-20°C) thoongarathukku help pannum—melatonin production perugum. 🛌",
+                    "Caffeine 6 hours body-la irukum—evening coffee/tea affect pannudhuya? ☕",
+                    "Western Ghats rain sound kettu thoongalam—thoongarathukku help aagum. Track venuma? 🎶",
+                ],
+                relationships: [
+                    "Active listening pannina rishte nalla irukum—ketta pinadi repeat panni confirm pannu. Practice pannuviya? 👂",
+                    "‘Enakku ippadi thonudhu appadiyae…’ nu solli clear-a pesuvom. Try pannuviya? 💬",
+                    "Raathiri sapadu saathu saapidalam—relationship strong aagum. Plan pannuviya? 🍽️",
+                    "Jhagda jaldi solve pannina nalladhu—idha eppadi handle pannalam? 🤝",
+                ],
+            },
+            responses: {
+                anxiety: "Raathiri 10:40 la anxiety aagudhu nu puriyudhu—kashtama irukum. Grounding techniques pannuvoma? 🌈",
+                depression: "Manasu downa irukku—adhu heavy-a irukum da. Innaiku raathiri konjam help pannuvoma? 💡",
+                stress: "Stress raathiri romba feel aagum—enna main pressure, pesuvoma? 🤗",
+                sleep: "10:40 PM aagiduchu—thoongaradhu kashtam. Thoongarathukku tips try pannuviya? 🌙",
+                relationships: "Rishte manasula romba impact pannum—enna nadakkudhu, sollu paakalam? 💞",
+                coping: "Nee solradha paatha, intha ideas raathiri unakku help pannum: ✨",
+                thanks: "Nee share pannirukke—romba nalladhu! Innum explore pannuviya? 🌟",
+                thanksFollowUp: "Innum ideas illa resources paaklama—enna venum? 📚",
+                generic: [
+                    "Share pannirukke, nandri—idhu un raathiri eppadi affect pannudhu? 🤔",
+                    "Naan ketkuren—innum enna purinjukka venum? 🗣️",
+                    "Raathiri unakku enna mukkiyam aagudhu? 👂",
+                    "Idhu konjam kashtama irukku—raathiri enna help venum? 💭",
+                    "Raathiri konjam plan pannuvom—enna pannuviya? 🚀",
+                ],
+                positiveSentiment: [
+                    "Nee konjam happy-a irukke—super da! Raathiri enna unakku santhoshama irukku? 😊",
+                    "Nalla vibe-a irukke—mast! Ippo enna nalladhu nadakkudhu? 🥳",
+                ],
+                negativeSentiment: {
+                    mild: "Raathiri konjam down-a irukke—naan irukken, pesuvoma? 🥰",
+                    severe: "Romba kashtama irukku nu puriyudhu—sorry da. Raathiri konjam help pannuvoma? 🤗",
+                },
+                followUp: {
+                    anxiety: "Ippo anxiety konjam kammi aacha, illa raathiri vera pannuvoma?",
+                    depression: "Mood konjam maariyacha, illa innaiku raathiri vera pannuvoma?",
+                    stress: "Stress kammi aacha, illa thoongaradhukku munna vera try pannuvoma?",
+                    sleep: "Ippo thoongalam nu thonudha, illa innum tips venuma?",
+                    relationships: "Idhu help pannucha, illa innum pesanuma idhpathi?",
+                    generic: "Ippo eppadi irukke? Innum pesanuma illa vera pannanuma? 😊",
+                },
+                proactive: {
+                    anxiety: "Munnadiyum anxiety pathi sonniya—raathiri konjam vera try pannuvoma?",
+                    depression: "Munnadiyum manasu down-nu sonniya—raathiri mood maara idea venuma?",
+                    stress: "Munnadiyum stress pathi sonniya—raathiri relax pannurathukku idea paaklama?",
+                    sleep: "Munnadiyum thoongala nu sonniya—ippo thoongarathukku help pannuvoma?",
+                    relationships: "Munnadiyum rishte pathi sonniya—ippo pesanuma illa vera pannanuma?",
+                },
+            },
+        },
+    };
 
-            // Utility Functions
-            const utils = {
-                formatTime: (date) =>
-                    date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
-                triggerConfetti: () =>
-                    confetti({
-                        particleCount: 100,
-                        spread: 70,
-                        origin: { y: 0.6 },
-                        colors: ["#ff6f91", "#a29bfe", "#feca57"],
-                    }),
-                triggerEmojiBurst: (container, emojis) => {
-                    for (let i = 0; i < 5; i++) {
-                        const emoji = document.createElement("span");
-                        emoji.classList.add("emoji-burst");
-                        emoji.textContent = emojis[Math.floor(Math.random() * emojis.length)];
-                        emoji.style.left = `${Math.random() * 100}%`;
-                        emoji.style.top = `${Math.random() * 100}%`;
-                        container.appendChild(emoji);
-                    }
-                },
-                addMessage: (text, isUser = false) => {
-                    const messageDiv = document.createElement("div");
-                    messageDiv.classList.add("message", isUser ? "user-message" : "bot-message");
-                    const now = new Date();
-                    messageDiv.innerHTML = `${text}<span class="message-time">${utils.formatTime(now)}</span>`;
-                    elements.chatContainer.appendChild(messageDiv);
-                    elements.chatContainer.scrollTop = elements.chatContainer.scrollHeight;
-                },
-                showTyping: () => {
-                    const typingDiv = document.createElement("div");
-                    typingDiv.classList.add("typing-indicator");
-                    typingDiv.id = "typing-indicator";
-                    typingDiv.innerHTML = `
-                        <span class="typing-dot"></span>
-                        <span class="typing-dot"></span>
-                        <span class="typing-dot"></span>
+    // Crisis Detection Configuration
+    const crisisConfig = {
+        keywords: [
+            "suicide", "kill myself", "end my life", "want to die", "harm myself",
+            "self-harm", "hopeless", "no point", "give up", "cannot go on", "worthless",
+        ],
+        resources: [
+            "Vandrevala Foundation: <strong>Call 9999666555</strong>",
+            "AASRA Suicide Prevention: <strong>Call +91-9820466726</strong>",
+            "iCall Helpline: <strong>Call +91-9152987821</strong>",
+            "Mpower Emergency: <strong>Call 1800-120-820050</strong>",
+            "Emergency Services: <strong>112</strong>",
+        ],
+    };
+
+    // NLP Configuration
+    const nlpConfig = {
+        sentimentThresholds: {
+            positive: 0.3,
+            negativeMild: -0.3,
+            negativeSevere: -0.7,
+        },
+        intents: {
+            greeting: ["hi", "hello", "hey", "namaste", "vanakkam"],
+            thanks: ["thanks", "thank you", "shukriya", "nandri"],
+            goodbye: ["bye", "goodbye", "see you", "chalta hoon", "poitu varen"],
+            coping: ["coping", "tips", "ideas", "help me", "what can i do", "venum"],
+            moodCheck: ["how am i", "my mood", "feeling", "lag raha", "irukku"],
+        },
+        emotionKeywords: {
+            anxiety: ["anxious", "worried", "nervous", "ghabrahat", "bayama"],
+            depression: ["sad", "down", "depressed", "low", "udaas", "downa"],
+            stress: ["stressed", "pressure", "overwhelmed", "tension", "stress aa"],
+            sleep: ["sleep", "insomnia", "can’t sleep", "neend", "thoongala"],
+            relationships: ["relationship", "friend", "family", "rishton", "vishayam"],
+        },
+    };
+
+    // Utility Functions
+    const utils = {
+        formatTime: (date) => date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+        triggerConfetti: () => confetti({
+            particleCount: 100,
+            spread: 70,
+            origin: { y: 0.6 },
+            colors: ["#ff6f91", "#a29bfe", "#feca57"],
+        }),
+        triggerEmojiBurst: (container, emojis) => {
+            for (let i = 0; i < 5; i++) {
+                const emoji = document.createElement("span");
+                emoji.classList.add("emoji-burst");
+                emoji.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+                emoji.style.left = `${Math.random() * 100}%`;
+                emoji.style.top = `${Math.random() * 100}%`;
+                container.appendChild(emoji);
+            }
+        },
+        addMessage: (text, isUser = false) => {
+            const messageDiv = document.createElement("div");
+            messageDiv.classList.add("message", isUser ? "user-message" : "bot-message");
+            const now = new Date();
+            messageDiv.innerHTML = `${text}<span class="message-time">${utils.formatTime(now)}</span>`;
+            elements.chatContainer.appendChild(messageDiv);
+            elements.chatContainer.scrollTop = elements.chatContainer.scrollHeight;
+        },
+        showTyping: () => {
+            const typingDiv = document.createElement("div");
+            typingDiv.classList.add("typing-indicator");
+            typingDiv.id = "typing-indicator";
+            typingDiv.innerHTML = `
+                <span class="typing-dot"></span>
+                <span class="typing-dot"></span>
+                <span class="typing-dot"></span>
+            `;
+            elements.chatContainer.appendChild(typingDiv);
+            elements.chatContainer.scrollTop = elements.chatContainer.scrollHeight;
+            return typingDiv;
+        },
+        hideTyping: () => {
+            const typingIndicator = document.getElementById("typing-indicator");
+            if (typingIndicator) typingIndicator.remove();
+        },
+        calculateStreak: (moodData) => {
+            const today = new Date();
+            let streak = 0;
+            for (let i = 0; i < 7; i++) {
+                const date = new Date(today);
+                date.setDate(today.getDate() - i);
+                const dateStr = date.toISOString().split("T")[0];
+                const hasMood = moodData.some(entry => entry.date === dateStr);
+                if (!hasMood) break;
+                streak++;
+            }
+            return streak;
+        },
+    };
+
+    // DOM Elements
+    const elements = {
+        authContainer: document.getElementById("auth-container"),
+        mainApp: document.getElementById("main-app"),
+        loginForm: document.getElementById("login-form"),
+        registerForm: document.getElementById("register-form"),
+        toggleToRegister: document.getElementById("toggle-to-register"),
+        toggleToLogin: document.getElementById("toggle-to-login"),
+        logoutBtn: document.getElementById("logout-btn"),
+        languageSelector: document.getElementById("language-selector"),
+        chatContainer: document.getElementById("chat-messages"),
+        quickRepliesContainer: document.getElementById("quick-replies"),
+        userInput: document.getElementById("user-input"),
+        sendBtn: document.getElementById("send-btn"),
+        tabLinks: document.querySelectorAll(".nav-item"),
+        tabContents: document.querySelectorAll(".tab-content"),
+        moodButtons: document.querySelectorAll(".mood-btn"),
+        actionChecks: document.querySelectorAll(".action-check"),
+        feedbackBtn: document.getElementById("feedback-btn"),
+        feedbackText: document.getElementById("feedback-text"),
+    };
+
+    // NLP Engine
+    const nlp = {
+        analyzeSentiment: (message) => {
+            const positiveWords = ["good", "great", "happy", "awesome", "nice", "khush", "nalla"];
+            const negativeWords = ["bad", "sad", "terrible", "awful", "down", "udaas", "kashtam"];
+            const lowerMsg = message.toLowerCase();
+            let score = 0;
+
+            positiveWords.forEach(word => {
+                if (lowerMsg.includes(word)) score += 0.5;
+            });
+            negativeWords.forEach(word => {
+                if (lowerMsg.includes(word)) score -= 0.5;
+            });
+
+            if (score >= nlpConfig.sentimentThresholds.positive) return "positive";
+            if (score <= nlpConfig.sentimentThresholds.negativeSevere) return "negativeSevere";
+            if (score <= nlpConfig.sentimentThresholds.negativeMild) return "negativeMild";
+            return "neutral";
+        },
+        detectIntent: (message) => {
+            const lowerMsg = message.toLowerCase();
+            for (const [intent, keywords] of Object.entries(nlpConfig.intents)) {
+                if (keywords.some(keyword => lowerMsg.includes(keyword))) {
+                    return intent;
+                }
+            }
+            return "unknown";
+        },
+        detectEmotion: (message) => {
+            const lowerMsg = message.toLowerCase();
+            for (const [emotion, keywords] of Object.entries(nlpConfig.emotionKeywords)) {
+                if (keywords.some(keyword => lowerMsg.includes(keyword))) {
+                    return emotion;
+                }
+            }
+            return null;
+        },
+        scoreResponse: (message, userMoodTrend, timeOfDay) => {
+            const emotion = nlp.detectEmotion(message) || "generic";
+            const sentiment = nlp.analyzeSentiment(message);
+            const intent = nlp.detectIntent(message);
+            let score = 0;
+
+            // Emotion-based scoring
+            if (emotion !== "generic") score += 3;
+            if (timeOfDay === "night" && emotion === "sleep") score += 2;
+
+            // Sentiment-based scoring
+            if (sentiment === "positive") score += 1;
+            if (sentiment === "negativeSevere") score += 2;
+
+            // Intent-based scoring
+            if (intent === "coping") score += 2;
+            if (intent === "thanks") score += 1;
+
+            // User history-based scoring
+            if (userMoodTrend === "negative" && ["anxiety", "depression", "stress"].includes(emotion)) score += 1;
+
+            return { emotion, sentiment, intent, score };
+        },
+    };
+
+    // Recommendation Engine
+    const recommender = {
+        getPersonalizedTips: (emotion, userMoodTrend) => {
+            const lang = languageData[state.currentLanguage];
+            const allTips = lang.copingStrategies[emotion] || [];
+            const userMoods = state.moodData[state.currentUser] || [];
+            const recentMoods = userMoods.slice(-3).map(m => m.value);
+
+            // Prioritize tips based on user history and current emotion
+            if (emotion === "sleep" && recentMoods.every(m => m <= 3)) {
+                return allTips.filter(tip => tip.includes("calming routine") || tip.includes("nature sounds"));
+            }
+            if (emotion === "depression" && userMoodTrend === "negative") {
+                return allTips.filter(tip => tip.includes("connecting") || tip.includes("self-compassion"));
+            }
+            return allTips.sort(() => 0.5 - Math.random()).slice(0, 3);
+        },
+        getUserMoodTrend: () => {
+            const userMoods = state.moodData[state.currentUser] || [];
+            const recentMoods = userMoods.slice(-5).map(m => m.value);
+            if (recentMoods.length < 3) return "neutral";
+            const averageMood = recentMoods.reduce((a, b) => a + b, 0) / recentMoods.length;
+            return averageMood < 3 ? "negative" : averageMood > 3 ? "positive" : "neutral";
+        },
+    };
+
+    // Authentication
+    const auth = {
+        initialize: () => {
+            try {
+                if (localStorage.getItem("currentUser")) {
+                    state.isAuthenticated = true;
+                    state.currentUser = localStorage.getItem("currentUser");
+                    elements.authContainer.style.display = "none";
+                    elements.mainApp.style.display = "flex";
+                    utils.triggerConfetti();
+                    app.initializeMoodChart();
+                    app.updateChatLanguage();
+                }
+            } catch (error) {
+                console.error("Auth initialization failed:", error);
+            }
+        },
+        login: () => {
+            const email = document.getElementById("login-email").value;
+            const password = document.getElementById("login-password").value;
+            if (!email || !password) {
+                alert("Please enter both email and password.");
+                return;
+            }
+            if (state.users[email] && state.users[email].password === password) {
+                state.isAuthenticated = true;
+                state.currentUser = email;
+                localStorage.setItem("currentUser", email);
+                elements.authContainer.style.display = "none";
+                elements.mainApp.style.display = "flex";
+                app.initializeMoodChart();
+                app.updateChatLanguage();
+                utils.triggerConfetti();
+            } else {
+                alert("Invalid email or password!");
+            }
+        },
+        register: () => {
+            const email = document.getElementById("register-email").value;
+            const password = document.getElementById("register-password").value;
+            const confirmPassword = document.getElementById("confirm-password").value;
+            if (!email || !password || !confirmPassword) {
+                alert("Please fill in all fields.");
+                return;
+            }
+            if (password !== confirmPassword) {
+                alert("Passwords do not match!");
+                return;
+            }
+            if (state.users[email]) {
+                alert("User already exists!");
+                return;
+            }
+            state.users[email] = { password, moods: [] };
+            localStorage.setItem("users", JSON.stringify(state.users));
+            alert("Registration successful! Please login.");
+            elements.loginForm.style.display = "flex";
+            elements.registerForm.style.display = "none";
+        },
+        logout: () => {
+            state.isAuthenticated = false;
+            state.currentUser = null;
+            state.conversationHistory = [];
+            localStorage.removeItem("currentUser");
+            elements.authContainer.style.display = "flex";
+            elements.mainApp.style.display = "none";
+            elements.loginForm.style.display = "flex";
+            elements.registerForm.style.display = "none";
+        },
+    };
+
+    // Main App Logic
+    const app = {
+        initializeMoodChart: () => {
+            try {
+                const moodCtx = document.getElementById("mood-chart").getContext("2d");
+                const userMoods = state.moodData[state.currentUser] || [];
+                const labels = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+                const data = Array(7).fill(null);
+
+                userMoods.forEach((mood) => {
+                    const date = new Date(mood.date);
+                    const dayIndex = date.getDay() === 0 ? 6 : date.getDay() - 1;
+                    data[dayIndex] = mood.value;
+                });
+
+                state.moodChart = new Chart(moodCtx, {
+                    type: "line",
+                    data: {
+                        labels,
+                        datasets: [{
+                            label: "Mood Level",
+                            data,
+                            borderColor: "#ff6f91",
+                            backgroundColor: "rgba(255, 111, 145, 0.1)",
+                            borderWidth: 3,
+                            pointRadius: 6,
+                            pointBackgroundColor: "#ff6f91",
+                            tension: 0.3,
+                            fill: true,
+                        }],
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                min: 1,
+                                max: 5,
+                                ticks: {
+                                    callback: (value) => {
+                                        const moods = ["Terrible", "Poor", "Neutral", "Good", "Excellent"];
+                                        return moods[value - 1];
+                                    },
+                                },
+                            },
+                        },
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                callbacks: {
+                                    label: (context) => {
+                                        const moods = ["Terrible", "Poor", "Neutral", "Good", "Excellent"];
+                                        return context.parsed.y ? moods[context.parsed.y - 1] : "No data";
+                                    },
+                                },
+                            },
+                        },
+                    },
+                });
+            } catch (error) {
+                console.error("Mood chart initialization failed:", error);
+            }
+        },
+        updateChatLanguage: () => {
+            const lang = languageData[state.currentLanguage];
+            app.updateQuickReplies(lang.quickReplies);
+            const initialMessageDiv = document.getElementById("initial-message");
+            const now = new Date();
+            initialMessageDiv.innerHTML = `${lang.initialMessages[0]}<span class="message-time">${utils.formatTime(now)}</span>`;
+        },
+        updateQuickReplies: (replies) => {
+            elements.quickRepliesContainer.innerHTML = "";
+            replies.forEach((reply) => {
+                const button = document.createElement("button");
+                button.classList.add("quick-reply");
+                button.setAttribute("data-reply", reply.value);
+                button.textContent = reply.text;
+                button.setAttribute("aria-label", reply.text);
+                elements.quickRepliesContainer.appendChild(button);
+                button.addEventListener("click", () => {
+                    const replyText = button.textContent;
+                    const replyValue = button.getAttribute("data-reply");
+                    utils.addMessage(replyText, true);
+                    state.conversationHistory.push({ user: replyText, intent: replyValue });
+                    const typingIndicator = utils.showTyping();
+                    chat.generateResponse(replyText);
+                    utils.triggerEmojiBurst(elements.chatContainer, ["😊", "🌟", "💖"]);
+                });
+            });
+        },
+        updateDynamicQuickReplies: (context) => {
+            const lang = languageData[state.currentLanguage];
+            let dynamicReplies = [...lang.quickReplies];
+            if (context === "sleep") {
+                dynamicReplies = [
+                    { text: "I’ll try a routine 📖", value: "sleep_routine" },
+                    { text: "Any calming sounds? 🎶", value: "sleep_sounds" },
+                    { text: "I had caffeine earlier ☕", value: "sleep_caffeine" },
+                ];
+            } else if (context === "thanks") {
+                dynamicReplies = [
+                    { text: "Yes, more ideas please! 📚", value: "more_ideas" },
+                    { text: "I’m good for now 😊", value: "goodbye" },
+                ];
+            }
+            app.updateQuickReplies(dynamicReplies);
+        },
+    };
+
+    // Chat Logic
+    const chat = {
+        generateResponse: (userMessage) => {
+            const lowerMsg = userMessage.toLowerCase();
+            const lang = languageData[state.currentLanguage];
+            const hasCrisis = crisisConfig.keywords.some(keyword => lowerMsg.includes(keyword));
+
+            // Store user message in conversation history
+            state.conversationHistory.push({ user: userMessage });
+
+            if (hasCrisis) {
+                setTimeout(() => {
+                    utils.hideTyping();
+                    const alertDiv = document.createElement("div");
+                    alertDiv.classList.add("crisis-alert");
+                    alertDiv.innerHTML = `
+                        <strong>⚠️ Crisis Detected</strong><br>
+                        Your message suggests you might be in crisis. Please reach out to these resources immediately:
                     `;
-                    elements.chatContainer.appendChild(typingDiv);
+                    const resourcesDiv = document.createElement("div");
+                    resourcesDiv.classList.add("resources-card");
+                    resourcesDiv.innerHTML = crisisConfig.resources.join("<br />");
+                    elements.chatContainer.appendChild(alertDiv);
+                    elements.chatContainer.appendChild(resourcesDiv);
                     elements.chatContainer.scrollTop = elements.chatContainer.scrollHeight;
-                    return typingDiv;
-                },
-                hideTyping: () => {
-                    const typingIndicator = document.getElementById("typing-indicator");
-                    if (typingIndicator) typingIndicator.remove();
-                },
-            };
-
-            // DOM Elements
-            const elements = {
-                authContainer: document.getElementById("auth-container"),
-                mainApp: document.getElementById("main-app"),
-                loginForm: document.getElementById("login-form"),
-                registerForm: document.getElementById("register-form"),
-                toggleToRegister: document.getElementById("toggle-to-register"),
-                toggleToLogin: document.getElementById("toggle-to-login"),
-                logoutBtn: document.getElementById("logout-btn"),
-                languageSelector: document.getElementById("language-selector"),
-                chatContainer: document.getElementById("chat-messages"),
-                quickRepliesContainer: document.getElementById("quick-replies"),
-                userInput: document.getElementById("user-input"),
-                sendBtn: document.getElementById("send-btn"),
-                tabLinks: document.querySelectorAll(".nav-item"),
-                tabContents: document.querySelectorAll(".tab-content"),
-                moodButtons: document.querySelectorAll(".mood-btn"),
-                actionChecks: document.querySelectorAll(".action-check"),
-                feedbackBtn: document.getElementById("feedback-btn"),
-                feedbackText: document.getElementById("feedback-text"),
-            };
-
-            // Authentication
-            const auth = {
-                initialize: () => {
-                    if (localStorage.getItem("currentUser")) {
-                        state.isAuthenticated = true;
-                        state.currentUser = localStorage.getItem("currentUser");
-                        elements.authContainer.style.display = "none";
-                        elements.mainApp.style.display = "flex";
-                        utils.triggerConfetti();
-                        app.initializeMoodChart();
-                        app.updateChatLanguage();
-                    }
-                },
-                login: () => {
-                    const email = document.getElementById("login-email").value;
-                    const password = document.getElementById("login-password").value;
-                    if (state.users[email] && state.users[email].password === password) {
-                        state.isAuthenticated = true;
-                        state.currentUser = email;
-                        localStorage.setItem("currentUser", email);
-                        elements.authContainer.style.display = "none";
-                        elements.mainApp.style.display = "flex";
-                        app.initializeMoodChart();
-                        app.updateChatLanguage();
-                        utils.triggerConfetti();
-                    } else {
-                        alert("Invalid email or password!");
-                    }
-                },
-                register: () => {
-                    const email = document.getElementById("register-email").value;
-                    const password = document.getElementById("register-password").value;
-                    const confirmPassword = document.getElementById("confirm-password").value;
-                    if (password !== confirmPassword) {
-                        alert("Passwords do not match!");
-                        return;
-                    }
-                    if (state.users[email]) {
-                        alert("User already exists!");
-                        return;
-                    }
-                    state.users[email] = { password, moods: [] };
-                    localStorage.setItem("users", JSON.stringify(state.users));
-                    alert("Registration successful! Please login.");
-                    elements.loginForm.style.display = "flex";
-                    elements.registerForm.style.display = "none";
-                },
-                logout: () => {
-                    state.isAuthenticated = false;
-                    state.currentUser = null;
-                    localStorage.removeItem("currentUser");
-                    elements.authContainer.style.display = "flex";
-                    elements.mainApp.style.display = "none";
-                    elements.loginForm.style.display = "flex";
-                    elements.registerForm.style.display = "none";
-                },
-            };
-
-            // Main App Logic
-            const app = {
-                initializeMoodChart: () => {
-                    const moodCtx = document.getElementById("mood-chart").getContext("2d");
-                    const userMoods = state.moodData[state.currentUser] || [];
-                    const labels = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
-                    const data = Array(7).fill(null);
-
-                    userMoods.forEach((mood) => {
-                        const date = new Date(mood.date);
-                        const dayIndex = date.getDay() === 0 ? 6 : date.getDay() - 1;
-                        data[dayIndex] = mood.value;
-                    });
-
-                    state.moodChart = new Chart(moodCtx, {
-                        type: "line",
-                        data: {
-                            labels,
-                            datasets: [
-                                {
-                                    label: "Mood Level",
-                                    data,
-                                    borderColor: "#ff6f91",
-                                    backgroundColor: "rgba(255, 111, 145, 0.1)",
-                                    borderWidth: 3,
-                                    pointRadius: 6,
-                                    pointBackgroundColor: "#ff6f91",
-                                    tension: 0.3,
-                                    fill: true,
-                                },
-                            ],
-                        },
-                        options: {
-                            responsive: true,
-                            maintainAspectRatio: false,
-                            scales: {
-                                y: {
-                                    min: 1,
-                                    max: 5,
-                                    ticks: {
-                                        callback: (value) => {
-                                            const moods = ["Terrible", "Poor", "Neutral", "Good", "Excellent"];
-                                            return moods[value - 1];
-                                        },
-                                    },
-                                },
-                            },
-                            plugins: {
-                                legend: { display: false },
-                                tooltip: {
-                                    callbacks: {
-                                        label: (context) => {
-                                            const moods = ["Terrible", "Poor", "Neutral", "Good", "Excellent"];
-                                            return context.parsed.y ? moods[context.parsed.y - 1] : "No data";
-                                        },
-                                    },
-                                },
-                            },
-                        },
-                    });
-                },
-                updateChatLanguage: () => {
-                    const lang = languageData[state.currentLanguage];
-                    elements.quickRepliesContainer.innerHTML = "";
-                    lang.quickReplies.forEach((reply) => {
-                        const button = document.createElement("button");
-                        button.classList.add("quick-reply");
-                        button.setAttribute("data-reply", reply.value);
-                        button.textContent = reply.text;
-                        button.setAttribute("aria-label", reply.text);
-                        elements.quickRepliesContainer.appendChild(button);
-                    });
-
-                    const initialMessageDiv = document.getElementById("initial-message");
-                    const now = new Date();
-                    initialMessageDiv.innerHTML = `${lang.initialMessages[0]}<span class="message-time">${utils.formatTime(now)}</span>`;
-
-                    document.querySelectorAll(".quick-reply").forEach((button) => {
-                        button.addEventListener("click", function () {
-                            const reply = this.getAttribute("data-reply");
-                            utils.addMessage(this.textContent, true);
-                            const typingIndicator = utils.showTyping();
-                            chat.generateResponse(reply);
-                            utils.triggerEmojiBurst(elements.chatContainer, ["😊", "🌟", "💖"]);
-                        });
-                    });
-                },
-            };
-
-            // Chat Logic
-            const chat = {
-                generateResponse: (userMessage) => {
-                    const lowerMsg = userMessage.toLowerCase();
-                    const lang = languageData[state.currentLanguage];
-                    const hasCrisis = crisisConfig.keywords.some((keyword) => lowerMsg.includes(keyword));
-
-                    if (hasCrisis) {
-                        setTimeout(() => {
-                            utils.hideTyping();
-                            const alertDiv = document.createElement("div");
-                            alertDiv.classList.add("crisis-alert");
-                            alertDiv.innerHTML = `
-                                <strong>⚠️ Crisis Detected</strong><br>
-                                Your message suggests you might be in crisis. Please reach out to these resources immediately:
-                            `;
-                            const resourcesDiv = document.createElement("div");
-                            resourcesDiv.classList.add("resources-card");
-                            resourcesDiv.innerHTML = crisisConfig.resources.join("<br />");
-                            elements.chatContainer.appendChild(alertDiv);
-                            elements.chatContainer.appendChild(resourcesDiv);
-                            elements.chatContainer.scrollTop = elements.chatContainer.scrollHeight;
-
-                            setTimeout(() => {
-                                utils.addMessage(lang.crisisResponse);
-                            }, 1000);
-                        }, 1500);
-                        return;
-                    }
 
                     setTimeout(() => {
-                        utils.hideTyping();
-                        if (lowerMsg.includes("anxious") || lowerMsg.includes("ghabrahat") || lowerMsg.includes("bayama")) {
-                            utils.addMessage(lang.responses.anxiety);
-                            chat.sendCopingTips(lang.copingStrategies.anxiety, lang.responses);
-                        } else if (lowerMsg.includes("low") || lowerMsg.includes("udaas") || lowerMsg.includes("downa")) {
-                            utils.addMessage(lang.responses.depression);
-                            chat.sendCopingTips(lang.copingStrategies.depression, lang.responses);
-                        } else if (lowerMsg.includes("stress") || lowerMsg.includes("tension") || lowerMsg.includes("pressure")) {
-                            utils.addMessage(lang.responses.stress);
-                            chat.sendCopingTips(lang.copingStrategies.stress, lang.responses);
-                        } else if (lowerMsg.includes("sleep") || lowerMsg.includes("neend") || lowerMsg.includes("thoongala")) {
-                            utils.addMessage(lang.responses.sleep);
-                            chat.sendCopingTips(lang.copingStrategies.sleep, lang.responses);
-                        } else if (lowerMsg.includes("relationship") || lowerMsg.includes("rishton") || lowerMsg.includes("vishayam")) {
-                            utils.addMessage(lang.responses.relationships);
-                            chat.sendCopingTips(lang.copingStrategies.relationships, lang.responses);
-                        } else if (lowerMsg.includes("coping") || lowerMsg.includes("tips") || lowerMsg.includes("venum")) {
-                            utils.addMessage(lang.responses.coping);
-                            const allTips = Object.values(lang.copingStrategies).flat();
-                            const randomTips = allTips.sort(() => 0.5 - Math.random()).slice(0, 4);
-                            chat.sendCopingTips(randomTips, lang.responses);
-                        } else {
-                            const randomResponse = lang.responses.generic[Math.floor(Math.random() * lang.responses.generic.length)];
-                            utils.addMessage(randomResponse);
-                        }
-                    }, 1500);
-                },
-                sendCopingTips: (tips, responses) => {
-                    tips.forEach((tip, index) => {
+                        utils.addMessage(lang.crisisResponse);
+                        app.updateDynamicQuickReplies("crisis");
+                    }, 1000);
+                }, 1500);
+                return;
+            }
+
+            setTimeout(() => {
+                utils.hideTyping();
+                const userMoodTrend = recommender.getUserMoodTrend();
+                const timeOfDay = new Date().getHours() >= 18 ? "night" : "day";
+                const { emotion, sentiment, intent, score } = nlp.scoreResponse(userMessage, userMoodTrend, timeOfDay);
+
+                // Intent-based responses
+                if (intent === "greeting") {
+                    utils.addMessage(lang.initialMessages[1]);
+                    state.lastResponseType = "greeting";
+                    return;
+                }
+                if (intent === "thanks") {
+                    utils.addMessage(lang.responses.thanks);
+                    setTimeout(() => {
+                        utils.addMessage(lang.responses.thanksFollowUp);
+                        app.updateDynamicQuickReplies("thanks");
+                    }, 1000);
+                    state.lastResponseType = "thanks";
+                    return;
+                }
+                if (intent === "goodbye") {
+                    utils.addMessage("Take care! I’m here if you need me later. 🌙");
+                    state.lastResponseType = "goodbye";
+                    return;
+                }
+                if (intent === "moodCheck") {
+                    const trend = recommender.getUserMoodTrend();
+                    utils.addMessage(`Based on your recent moods, you’ve been feeling ${trend}. How can I help you tonight?`);
+                    state.lastResponseType = "moodCheck";
+                    return;
+                }
+
+                // Emotion-based responses
+                if (emotion !== "generic") {
+                    const responseKey = emotion;
+                    const proactiveCheck = state.conversationHistory.filter(h => h.intent === emotion).length > 2;
+                    if (proactiveCheck && state.lastResponseType !== "proactive") {
+                        utils.addMessage(lang.responses.proactive[emotion]);
+                        state.lastResponseType = "proactive";
+                    } else {
+                        utils.addMessage(lang.responses[responseKey]);
+                        const personalizedTips = recommender.getPersonalizedTips(emotion, userMoodTrend);
+                        chat.sendCopingTips(personalizedTips, lang.responses);
+                        state.lastResponseType = "emotion";
+                    }
+                    app.updateDynamicQuickReplies(emotion);
+                    return;
+                }
+
+                // Sentiment-based responses
+                if (sentiment === "positive" && state.lastResponseType !== "positiveSentiment") {
+                    const randomResponse = lang.responses.positiveSentiment[Math.floor(Math.random() * lang.responses.positiveSentiment.length)];
+                    utils.addMessage(randomResponse);
+                    state.lastResponseType = "positiveSentiment";
+                    return;
+                }
+                if (sentiment === "negativeMild" || sentiment === "negativeSevere") {
+                    const responseKey = sentiment === "negativeMild" ? "mild" : "severe";
+                    utils.addMessage(lang.responses.negativeSentiment[responseKey]);
+                    state.lastResponseType = "negativeSentiment";
+                    return;
+                }
+
+                // Fallback to generic response
+                const randomResponse = lang.responses.generic[Math.floor(Math.random() * lang.responses.generic.length)];
+                utils.addMessage(randomResponse);
+                state.lastResponseType = "generic";
+            }, 1500);
+        },
+        sendCopingTips: (tips, responses) => {
+            tips.forEach((tip, index) => {
+                setTimeout(() => {
+                    utils.addMessage(tip);
+                    if (index === tips.length - 1) {
                         setTimeout(() => {
-                            utils.addMessage(tip);
-                            if (index === tips.length - 1) {
-                                setTimeout(() => {
-                                    utils.addMessage(responses.thanks);
-                                    setTimeout(() => {
-                                        utils.addMessage(responses.thanksFollowUp);
-                                    }, 1000);
-                                }, 1000);
-                            }
-                        }, index * 1000);
-                    });
-                },
-            };
+                            utils.addMessage(responses.followUp.generic);
+                        }, 1000);
+                    }
+                }, index * 1000);
+            });
+        },
+    };
 
-            // Event Listeners
-            const setupEventListeners = () => {
-                elements.toggleToRegister.addEventListener("click", () => {
-                    elements.loginForm.style.display = "none";
-                    elements.registerForm.style.display = "flex";
-                });
+    // Event Listeners
+    const setupEventListeners = () => {
+        elements.toggleToRegister.addEventListener("click", () => {
+            elements.loginForm.style.display = "none";
+            elements.registerForm.style.display = "flex";
+        });
 
-                elements.toggleToLogin.addEventListener("click", () => {
-                    elements.loginForm.style.display = "flex";
-                    elements.registerForm.style.display = "none";
-                });
+        elements.toggleToLogin.addEventListener("click", () => {
+            elements.loginForm.style.display = "flex";
+            elements.registerForm.style.display = "none";
+        });
 
-                document.getElementById("register-btn").addEventListener("click", auth.register);
-                document.getElementById("login-btn").addEventListener("click", auth.login);
-                elements.logoutBtn.addEventListener("click", auth.logout);
+        document.getElementById("register-btn").addEventListener("click", auth.register);
+        document.getElementById("login-btn").addEventListener("click", auth.login);
+        elements.logoutBtn.addEventListener("click", auth.logout);
 
-                elements.languageSelector.addEventListener("change", () => {
-                    state.currentLanguage = elements.languageSelector.value;
-                    localStorage.setItem("language", state.currentLanguage);
-                    app.updateChatLanguage();
-                });
+        elements.languageSelector.addEventListener("change", () => {
+            state.currentLanguage = elements.languageSelector.value;
+            localStorage.setItem("language", state.currentLanguage);
+            app.updateChatLanguage();
+        });
 
-                elements.tabLinks.forEach((link) => {
-                    link.addEventListener("click", (e) => {
-                        e.preventDefault();
-                        if (link.getAttribute("data-tab") === "mood" && !state.isAuthenticated) {
-                            alert("Please login to access the Mood Tracker");
-                            return;
-                        }
-                        elements.tabLinks.forEach((l) => l.classList.remove("active"));
-                        link.classList.add("active");
-                        elements.tabContents.forEach((c) => c.classList.remove("active"));
-                        document.getElementById(`${link.getAttribute("data-tab")}-tab`).classList.add("active");
-                    });
-                });
+        elements.tabLinks.forEach((link) => {
+            link.addEventListener("click", (e) => {
+                e.preventDefault();
+                if (link.getAttribute("data-tab") === "mood" && !state.isAuthenticated) {
+                    alert("Please login to access the Mood Tracker");
+                    return;
+                }
+                elements.tabLinks.forEach((l) => l.classList.remove("active"));
+                link.classList.add("active");
+                elements.tabContents.forEach((c) => c.classList.remove("active"));
+                document.getElementById(`${link.getAttribute("data-tab")}-tab`).classList.add("active");
+            });
+        });
 
-                elements.moodButtons.forEach((btn) => {
-                    btn.addEventListener("click", () => {
-                        elements.moodButtons.forEach((b) => b.classList.remove("selected"));
-                        btn.classList.add("selected");
+        elements.moodButtons.forEach((btn) => {
+            btn.addEventListener("click", () => {
+                elements.moodButtons.forEach((b) => b.classList.remove("selected"));
+                btn.classList.add("selected");
 
-                        const mood = btn.getAttribute("data-mood");
-                        const moodValues ={
-    excellent: 5,
-    good: 4,
-    neutral: 3,
-    poor: 2,
-    terrible: 1,
-};
-const moodValue = moodValues[mood];
-const today = new Date().toISOString().split("T")[0];
+                const mood = btn.getAttribute("data-mood");
+                const moodValues = {
+                    excellent: 5,
+                    good: 4,
+                    neutral: 3,
+                    poor: 2,
+                    terrible: 1,
+                };
+                const moodValue = moodValues[mood];
+                const today = new Date().toISOString().split("T")[0];
 
-if (!state.moodData[state.currentUser]) {
-    state.moodData[state.currentUser] = [];
-}
+                if (!state.moodData[state.currentUser]) {
+                    state.moodData[state.currentUser] = [];
+                }
 
-const existingMood = state.moodData[state.currentUser].find((entry) => entry.date === today);
-if (existingMood) {
-    existingMood.value = moodValue;
-} else {
-    state.moodData[state.currentUser].push({ date: today, value: moodValue });
-}
+                const existingMood = state.moodData[state.currentUser].find((entry) => entry.date === today);
+                if (existingMood) {
+                    existingMood.value = moodValue;
+                } else {
+                    state.moodData[state.currentUser].push({ date: today, value: moodValue });
+                }
 
-localStorage.setItem("moodData", JSON.stringify(state.moodData));
-state.moodChart.destroy();
-app.initializeMoodChart();
-utils.triggerConfetti();
-alert("Mood logged successfully! Keep tracking your progress. 🌟");
-});
-});
+                localStorage.setItem("moodData", JSON.stringify(state.moodData));
+                state.moodChart.destroy();
+                app.initializeMoodChart();
 
-elements.actionChecks.forEach((check) => {
-    check.addEventListener("click", () => {
-        check.classList.toggle("checked");
-        if (check.classList.contains("checked")) {
+                state.streakCount = utils.calculateStreak(state.moodData[state.currentUser]);
+                utils.triggerConfetti();
+                alert(`Mood logged successfully! You’re on a ${state.streakCount}-day streak—keep it up! 🌟`);
+            });
+        });
+
+        elements.actionChecks.forEach((check) => {
+            check.addEventListener("click", () => {
+                check.classList.toggle("checked");
+                if (check.classList.contains("checked")) {
+                    utils.triggerConfetti();
+                    const emojiContainer = check.closest(".action-item");
+                    utils.triggerEmojiBurst(emojiContainer, ["🎉", "✅", "🌟"]);
+                }
+            });
+        });
+
+        elements.feedbackBtn.addEventListener("click", () => {
+            const feedback = elements.feedbackText.value.trim();
+            if (!feedback) {
+                alert("Please provide your feedback before submitting.");
+                return;
+            }
+            alert("Thank you for your feedback! We’ll use it to improve MindAid. 💬");
+            elements.feedbackText.value = "";
             utils.triggerConfetti();
-            const emojiContainer = check.closest(".action-item");
-            utils.triggerEmojiBurst(emojiContainer, ["🎉", "✅", "🌟"]);
-        }
-    });
-});
+        });
 
-elements.feedbackBtn.addEventListener("click", () => {
-    const feedback = elements.feedbackText.value.trim();
-    if (!feedback) {
-        alert("Please provide your feedback before submitting.");
-        return;
-    }
-    alert("Thank you for your feedback! We’ll use it to improve MindAid Pro. 💬");
-    elements.feedbackText.value = "";
-    utils.triggerConfetti();
-});
+        elements.sendBtn.addEventListener("click", () => {
+            const userMessage = elements.userInput.value.trim();
+            if (!userMessage) return;
+            utils.addMessage(userMessage, true);
+            elements.userInput.value = "";
+            const typingIndicator = utils.showTyping();
+            chat.generateResponse(userMessage);
+            utils.triggerEmojiBurst(elements.chatContainer, ["😊", "🌟", "💖"]);
+        });
 
-elements.sendBtn.addEventListener("click", () => {
-    const userMessage = elements.userInput.value.trim();
-    if (!userMessage) return;
-    utils.addMessage(userMessage, true);
-    elements.userInput.value = "";
-    const typingIndicator = utils.showTyping();
-    chat.generateResponse(userMessage);
-    utils.triggerEmojiBurst(elements.chatContainer, ["😊", "🌟", "💖"]);
-});
+        elements.userInput.addEventListener("keypress", (e) => {
+            if (e.key === "Enter") {
+                elements.sendBtn.click();
+            }
+        });
+    };
 
-elements.userInput.addEventListener("keypress", (e) => {
-    if (e.key === "Enter") {
-        elements.sendBtn.click();
-    }
-});
-};
+    // Initialize
+    const init = () => {
+        elements.languageSelector.value = state.currentLanguage;
+        auth.initialize();
+        app.updateChatLanguage();
+        setupEventListeners();
+    };
 
-// Initialize
-const init = () => {
-    elements.languageSelector.value = state.currentLanguage;
-    auth.initialize();
-    app.updateChatLanguage();
-    setupEventListeners();
-};
-
-init();
+    init();
 })();</script>
 </body>
 </html>
