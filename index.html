@@ -1247,7 +1247,7 @@
     </div>
 
     <script>
-        (function () {
+      (function () {
     // State Management
     let state = {
         isAuthenticated: false,
@@ -1256,269 +1256,325 @@
         users: JSON.parse(localStorage.getItem("users")) || {},
         moodData: JSON.parse(localStorage.getItem("moodData")) || {},
         moodChart: null,
-        conversationHistory: [], // Track user interactions in session
-        lastResponseType: null, // Prevent repetitive responses
-        streakCount: 0, // For gamifying mood logging
+        conversationHistory: [], // Track user interactions
+        userPreferences: JSON.parse(localStorage.getItem("userPreferences")) || {}, // Store user preferences
+        comfortLevel: 0, // Track how comforted the user feels (0-10)
+        lastResponseType: null,
+        streakCount: 0,
     };
 
-    // Language Data (Updated for 10:40 PM IST, June 11, 2025)
+    // Language Data (Updated for 10:47 PM IST, June 11, 2025, with a maternal tone)
     const languageData = {
         english: {
             initialMessages: [
-                "Hi there! I’m MindAid, your mental health companion. 🌟 It’s 10:40 PM on a Wednesday—hope you’re winding down! How are you feeling tonight?",
-                "Feel free to share anything on your mind, or use the quick options to get started. What’s up?",
+                "Hello, my dear! I’m MindAid, here to take care of you like a mom. 🌟 It’s 10:47 PM on a Wednesday—oh, it’s getting late, sweetheart! How’s my darling feeling tonight?",
+                "You can tell me anything, my love. Type how you’re feeling, or pick one of the options below—I’m all ears for you. 🤗",
             ],
             quickReplies: [
-                { text: "I’m feeling anxious 😰", value: "anxiety" },
-                { text: "I’m feeling down 😔", value: "depression" },
-                { text: "I’m stressed out 😥", value: "stress" },
-                { text: "I can’t sleep 🌙", value: "sleep" },
-                { text: "I need coping ideas", value: "coping" },
+                { text: "I’m feeling anxious, Mom 😰", value: "anxiety" },
+                { text: "I’m feeling so down, Mom 😔", value: "depression" },
+                { text: "I’m stressed out, Mom 😥", value: "stress" },
+                { text: "I can’t sleep, Mom 🌙", value: "sleep" },
+                { text: "I need a hug, Mom 🤗", value: "need_hug" },
+                { text: "Tell me I’ll be okay, Mom 💖", value: "reassurance" },
             ],
-            crisisResponse: "I’m really concerned for you—it’s late, and you’re not alone. Would you like to connect with a support resource right now?",
+            crisisResponse: "Oh, my precious child, I’m so worried about you—it’s late, and I can’t bear to think of you feeling this way. You’re not alone, my love. Can I share some people who can help you right now?",
             copingStrategies: {
                 anxiety: [
-                    "Since it’s late, let’s try box breathing to calm your mind: inhale for 4 seconds, hold for 4, exhale for 4, pause for 4. Repeat 5 times. 🌬️ Ready to do this together?",
-                    "The 5-4-3-2-1 grounding method can help: name 5 things you see, 4 you can touch, 3 you hear, 2 you smell, and 1 you taste. It eases anxious thoughts. 👀 Want to try?",
-                    "A short walk outside, even just around your place, can lower stress hormones by up to 15%. Some fresh night air might help—up for it? 🌳",
-                    "Writing down your worries for 5 minutes can clear your mind before bed. I can give you a prompt if you’d like! 📝",
+                    "Oh, sweetheart, I can see you’re feeling anxious—let’s calm down together, okay? Take a deep breath with me: inhale for 4 seconds, hold for 4, exhale for 4, and pause for 4. 🌬️ Let’s do it 5 times, my dear—Mom’s right here with you.",
+                    "My darling, let’s try the 5-4-3-2-1 trick to feel better: tell me 5 things you see, 4 you can touch, 3 you hear, 2 you smell, and 1 you taste. It’ll help, I promise. 👀 Ready, my love?",
+                    "How about a little walk, my dear? Even just around your room—it can make you feel so much lighter. Fresh night air always helps. 🌳 Want to try it with me?",
+                    "Let’s write down what’s worrying you, sweetheart. Just 5 minutes before bed can make your heart feel lighter. Would you like a little prompt, my love? 📝",
                 ],
                 depression: [
-                    "Connecting with someone you trust can lift your spirits, even with a quick message. Who could you reach out to tonight? 📞",
-                    "Let’s do something small you enjoy, like listening to a calming song or sketching for 5 minutes. What sounds nice? 🎶",
-                    "Try saying something kind to yourself, like ‘I’m doing my best, and that’s enough.’ How does that feel? 💖",
-                    "Small wins matter, especially at night. How about making a warm drink to relax? ☕",
+                    "Oh, my sweet child, I’m so sorry you’re feeling down—it breaks my heart to hear this. How about messaging someone you love? A little chat can lift your spirits, my dear. Who can we reach out to tonight? 📞",
+                    "Let’s do something you love, my darling—even something small, like listening to a song that makes you smile or doodling for a bit. What would make you happy, my love? 🎶",
+                    "You’re doing so well, my precious one. Say this with me: ‘I’m enough, and I’m loved.’ I know it’s hard, but Mom believes in you. How does that feel, sweetheart? 💖",
+                    "Small steps make a big difference, my dear. How about we make a warm drink to sip before bed? It’ll feel like a little hug from Mom. ☕",
                 ],
                 stress: [
-                    "Let’s break it down—what’s stressing you out the most right now? We can tackle it together, one step at a time. 📋",
-                    "Progressive muscle relaxation can help you unwind before bed. Want to try tensing and releasing each muscle group? 🤸",
-                    "A ‘done list’ can make you feel accomplished. What are 3 things you’ve done today, even small ones? ✅",
-                    "Chamomile tea is perfect for late-night relaxation—it can ease tension. Want to give it a try? 🍵",
+                    "My poor darling, stress can feel so heavy, can’t it? Let’s sort it out together—what’s making you feel this way the most right now? Mom’s here to help. 📋",
+                    "Let’s try something to relax your body, my love. Tense up your shoulders, then let them go—feel the stress melt away. Want to do more with me, sweetheart? 🤸",
+                    "You’ve done so much today, my dear—I’m so proud of you! Let’s think of 3 things you finished, even small ones. What can we celebrate, my love? ✅",
+                    "A cup of chamomile tea can soothe you, my darling—it’s perfect for this late hour. Shall we make one together? 🍵",
                 ],
                 sleep: [
-                    "It’s 10:40 PM, so let’s set up a calming routine—maybe read a few pages or sip warm milk? 📖 What time do you want to sleep?",
-                    "A cooler bedroom (around 60-67°F) can help you fall asleep faster by boosting melatonin production. 🛌",
-                    "Caffeine can linger in your system for 6 hours—did you have any this evening that might be keeping you up? ☕",
-                    "Soft nature sounds, like rain or waves, can help you drift off. Want a recommendation for a calming track? 🎶",
+                    "It’s 10:47 PM, my sweet child—let’s get you ready for a cozy sleep, okay? How about a little routine—maybe read a page or two, or sip some warm milk? 📖 When do you want to sleep, my love?",
+                    "A cool room helps you sleep better, darling—around 60-67°F is just right. Let’s make your bed nice and comfy. 🛌",
+                    "Did you have any tea or coffee this evening, my dear? Caffeine can keep you awake, you know—let’s check. ☕",
+                    "Soft sounds can help you drift off, my darling—like gentle rain or waves. Would you like Mom to find a calming track for you? 🎶",
                 ],
                 relationships: [
-                    "Active listening can strengthen bonds—try reflecting back what you hear to show you care. Want to practice? 👂",
-                    "Use ‘I feel… when… because…’ to express yourself clearly. Let’s try it with something on your mind. 💬",
-                    "Spending quality time, like sharing a late-night snack, can bring you closer. Could you plan something small? 🍽️",
-                    "Resolving conflicts quickly can ease tension—how can we address what’s bothering you tonight? 🤝",
+                    "Relationships can be so tricky, my dear—I’m here for you. Try listening with all your heart—repeat what they say to show you care. Want to practice with me, sweetheart? 👂",
+                    "Let’s share how you feel, my love—say ‘I feel… when… because…’ It’ll help them understand you. Shall we try it together? 💬",
+                    "Spending time together can make things better, my darling—like sharing a late-night snack. Can we plan something sweet for you? 🍽️",
+                    "If something’s upsetting you, let’s sort it out gently, my dear. How can Mom help you fix this tonight? 🤝",
+                ],
+            },
+            comfortRituals: {
+                bedtime: [
+                    "Let’s make tonight cozy, my darling. First, let’s dim the lights—soft light helps you feel sleepy. Done that, sweetheart?",
+                    "Now, let’s take 3 deep breaths together, my love: in through your nose, out through your mouth. Ready? 🌬️",
+                    "How about we imagine a happy place, my dear? Picture a warm, safe spot—like a sunny garden or a cozy blanket. Tell me what you see, sweetheart.",
+                    "You’re doing so well, my precious one. Let’s snuggle into bed now—feel the softness of your pillow. Mom’s right here until you drift off. 🛌",
                 ],
             },
             responses: {
-                anxiety: "I can tell you’re feeling anxious, which can be tough this late at night. Let’s find a way to help you relax—how about a grounding technique? 🌈",
-                depression: "I’m sorry you’re feeling down—it can be so heavy. Let’s take it slow and find something small to help tonight. 💡",
-                stress: "Stress can feel overwhelming, especially at 10:40 PM. What’s been the biggest pressure for you today? Let’s work through it. 🤗",
-                sleep: "Struggling to sleep at this hour isn’t easy. Would you like some tips to help you wind down for the night? 🌙",
-                relationships: "Relationships can really affect how we feel. What’s been going on that you’d like to share? 💞",
-                coping: "Here are some strategies that might help you tonight, based on what you’ve shared: ✨",
-                thanks: "I’m so glad I could help! You’re doing great by reaching out—want to explore more? 🌟",
-                thanksFollowUp: "I can share more ideas or resources if you’d like. What’s next for you tonight? 📚",
+                anxiety: "Oh, my dear, I can feel how anxious you are—it must be so hard, especially this late at night. Mom’s here to help you feel safe. Shall we try something to calm your heart? 🌈",
+                depression: "My sweet child, I’m so sorry you’re feeling down—Mom’s heart aches for you. Let’s find a little light together, okay? I’m right here, my love. 💡",
+                stress: "Oh, darling, stress can be so heavy—I wish I could take it all away for you. Let’s work through it together, my precious one. What’s on your mind? 🤗",
+                sleep: "My poor baby, struggling to sleep at 10:47 PM—I’ll help you rest, I promise. Let’s make you feel cozy and safe, sweetheart. What’s keeping you awake, my dear? 🌙",
+                relationships: "Relationships can weigh on your heart, my love—I’m here to listen. What’s been happening, darling? Mom wants to help. 💞",
+                need_hug: "Come here, my darling—here’s a big, warm hug from Mom! 🤗 I’ve got you, sweetheart—everything’s going to be okay. Do you want to tell me more, my love?",
+                reassurance: "Oh, my precious one, you’ll be okay—I promise. Mom’s here, and I’ll never let you go. You’re so strong, my dear, and I’m so proud of you. 💖 Want to talk about what’s worrying you, sweetheart?",
+                coping: "Mom’s got some ideas to help you feel better tonight, my love—let’s try these together, okay? ✨",
+                thanks: "You’re so welcome, my darling—I’m always here for you. You’re doing so well, sweetheart. Want to keep going, my love? 🌟",
+                thanksFollowUp: "I’m so happy I could help, my dear. What else can Mom do for you tonight—maybe a little more comfort? 📚",
                 generic: [
-                    "Thanks for sharing—I’m here for you. How’s this affecting your evening? 🤔",
-                    "I’m listening closely. What else should I know about how you’re feeling tonight? 🗣️",
-                    "Let’s focus on what’s most important to you right now, especially this late. 👂",
-                    "That sounds like a lot to handle. What would feel helpful for you tonight? 💭",
-                    "Let’s find a small step you can take before bed—what feels manageable? 🚀",
+                    "Thank you for sharing, my sweet child—Mom’s listening with all her heart. How’s this making you feel tonight, darling? 🤔",
+                    "I’m right here for you, my love. Can you tell Mom a little more about what’s on your mind? 🗣️",
+                    "Let’s focus on what matters most to you right now, my dear—it’s late, and I want you to feel safe. 👂",
+                    "That sounds like a lot, my darling. What would make you feel better tonight—Mom’s here to help. 💭",
+                    "Let’s take a small step together before bed, sweetheart—what feels okay for you, my love? 🚀",
                 ],
                 positiveSentiment: [
-                    "You sound a bit brighter—that’s so great to hear! What’s lifting your spirits tonight? 😊",
-                    "I’m picking up some positive vibes—love that! What’s been going well for you at this hour? 🥳",
+                    "Oh, my darling, you sound a little brighter—Mom’s so happy to hear that! What’s making you smile tonight, sweetheart? 😊",
+                    "I can feel your happiness, my love—it warms my heart! What’s been good for you at this hour, my dear? 🥳",
                 ],
                 negativeSentiment: {
-                    mild: "I can sense you’re not feeling your best tonight—I’m here to help. Want to talk more? 🥰",
-                    severe: "I’m really sorry you’re feeling this way—it sounds so tough. Let’s find a way to ease things for you. 🤗",
+                    mild: "My poor baby, I can tell you’re not feeling your best tonight—Mom’s here to make it better. Want to share more, my love? 🥰",
+                    severe: "Oh, sweetheart, I’m so sorry you’re feeling this way—it hurts Mom to see you like this. Let’s make you feel safe, my dear—I’m right here. 🤗",
                 },
                 followUp: {
-                    anxiety: "Did that help calm your anxiety a bit, or should we try something else to relax tonight?",
-                    depression: "How are you feeling now—any better? Want to try another small step to lift your mood?",
-                    stress: "Is the stress feeling more manageable, or do you want to try another way to unwind before bed?",
-                    sleep: "Are you feeling sleepier now, or do you need more ideas to help you rest?",
-                    relationships: "Did that help at all, or would you like to talk more about what’s going on?",
-                    generic: "How are you doing now? I’m here if you want to chat more or try something new. 😊",
+                    anxiety: "Did that help calm you a bit, my darling? Or should Mom try something else to make you feel better tonight?",
+                    depression: "How’s my sweet child feeling now—any better? Want Mom to help with another little step, my love?",
+                    stress: "Is the stress feeling lighter, my dear? Or does Mom need to find another way to help you relax before bed?",
+                    sleep: "Are you feeling sleepier now, my precious one? Or does Mom need to help you more to rest, sweetheart?",
+                    relationships: "Did that help a little, my love? Or should Mom listen more about what’s going on, darling?",
+                    need_hug: "Did that hug help, my darling? Mom’s got plenty more for you—want another, sweetheart?",
+                    reassurance: "Feeling a bit better now, my dear? Mom’s here if you need more comfort, my love.",
+                    generic: "How are you doing now, my sweet child? Mom’s here if you want to talk more or try something new. 😊",
                 },
                 proactive: {
-                    anxiety: "I’ve noticed you’ve mentioned anxiety a few times—would you like to try a new technique tonight?",
-                    depression: "You’ve seemed down lately—let’s find something to help you feel a bit better before bed.",
-                    stress: "Stress has been coming up for you recently—want to try a new way to relax at this hour?",
-                    sleep: "I remember you’ve had trouble sleeping before—shall we try something to help you tonight?",
-                    relationships: "You’ve mentioned relationship challenges before—would you like to talk more about it now?",
+                    anxiety: "My dear, I’ve noticed you’ve been feeling anxious a lot—Mom’s worried. Shall we try a new way to feel calm tonight, sweetheart?",
+                    depression: "You’ve been feeling down lately, my love—it breaks Mom’s heart. Let’s find something to make you smile before bed, okay?",
+                    stress: "Stress has been heavy on you, my darling—I can tell. Want Mom to help you relax in a new way tonight?",
+                    sleep: "I know you’ve had trouble sleeping before, my precious one—Mom’s here to help. Shall we try something to make you feel cozy tonight?",
+                    relationships: "You’ve mentioned relationship worries before, my dear—Mom’s here to listen. Want to talk more about it now, sweetheart?",
                 },
+                clarification: [
+                    "Oh, my dear, I want to understand you better—can you tell Mom more about how you’re feeling, sweetheart?",
+                    "Mom’s here to help, my love, but I’m not sure what you need—can you share a little more, darling?",
+                    "My sweet child, I want to make you feel better—can you tell me what’s on your heart tonight?",
+                ],
             },
         },
         hinglish: {
             initialMessages: [
-                "Namaste! Main hoon MindAid, tera mental health dost. 🌸 Raat ke 10:40 ho gaye hain, Wednesday hai—tu kaisa hai abhi?",
-                "Yahan dil khol ke baat kar sakta hai—type karega ya quick options se shuru karega?",
+                "Namaste, mera pyara baccha! Main hoon MindAid, teri Mom jaise. 🌸 Raat ke 10:47 ho gaye hain, Wednesday hai—bohot late ho gaya, beta! Mera pyara abhi kaisa hai?",
+                "Mujhe sab kuch bata sakta hai, mera pyar. Type kar ya neeche se option chun—Mom poori dil se sun rahi hai. 🤗",
             ],
             quickReplies: [
-                { text: "Abhi anxiety ho rahi hai 😰", value: "anxiety" },
-                { text: "Udaas feel kar raha hoon 😔", value: "depression" },
-                { text: "Bohot stress mein hoon 😥", value: "stress" },
-                { text: "Neend nahi aa rahi 🌙", value: "sleep" },
-                { text: "Coping ke liye ideas chahiye", value: "coping" },
+                { text: "Mom, mujhe anxiety ho rahi hai 😰", value: "anxiety" },
+                { text: "Mom, main udaas hoon 😔", value: "depression" },
+                { text: "Mom, bohot stress hai 😥", value: "stress" },
+                { text: "Mom, neend nahi aa rahi 🌙", value: "sleep" },
+                { text: "Mom, mujhe jhappi chahiye 🤗", value: "need_hug" },
+                { text: "Mom, bolo sab theek hoga 💖", value: "reassurance" },
             ],
-            crisisResponse: "Mujhe lagta hai tu mushkil mein hai—tu akela nahi hai, yaar. Raat mein help ke liye kuch options bata doon?",
+            crisisResponse: "Mera pyara, Mom bohot pareshan hai—tu akele nahi hai, beta. Itni raat mein aise nahi soch sakta—main kuch help ke options bata doon?",
             copingStrategies: {
                 anxiety: [
-                    "Raat ho gayi hai, toh box breathing try karein: 4 second saans le, 4 hold, 4 chhod, 4 pause. 5 baar repeat kar—thoda relax hoga. 🌬️ Saath mein karein?",
-                    "5-4-3-2-1 se dimag shant karte hain: 5 cheezein dekh, 4 chhu, 3 sun, 2 smell kar, 1 taste kar. Yeh anxiety kam karega. 👀 Try karein?",
-                    "Thoda ghar ke bahar raat ki hawa mein ghoom aaye—stress hormones 15% tak kam ho sakte hain. Chalega? 🌳",
-                    "5 minute ke liye apni chinta likh—sone se pehle dimag halka hoga. Topic chahiye? 📝",
+                    "Arre mera baccha, anxiety ho rahi hai—itni raat mein yeh bohot mushkil hai. Mom ke saath saans le: 4 second saans le, 4 hold, 4 chhod, 4 pause. 5 baar karenge, beta? 🌬️",
+                    "5-4-3-2-1 se dil shant karte hain, mera pyar: 5 cheezein dekh, 4 chhu, 3 sun, 2 smell kar, 1 taste kar. Thoda better hoga, Mom promise karti hai. 👀 Karein?",
+                    "Thoda ghoom aayein, beta? Ghar ke aaspaas bhi chalega—raati ki hawa mein dil halka ho jayega. Saath mein chalenge? 🌳",
+                    "Apni chinta likh do, mera pyara—5 minute mein dil halka ho jayega sone se pehle. Mom topic de, chahiye? 📝",
                 ],
                 depression: [
-                    "Kisi dost ya gharwale se baat kar—ek chhota sa message bhi mood thik kar sakta hai. Kisse baat karega? 📞",
-                    "Kuch pasand ka kar—jaise 5 minute ke liye gaana sun ya drawing kar. Kya achha lagega? 🎶",
-                    "Khud se pyar wali baat bol: ‘Main apna best kar raha hoon, aur yeh kaafi hai.’ Kaisa laga? 💖",
-                    "Chhoti si jeet bhi badi hoti hai—raat ke liye garam doodh banayein? ☕",
+                    "Mera pyara, udaas hai—Mom ka dil toot raha hai. Kisi apne se baat karein? Ek message bhi dil halka kar sakta hai, beta. Kisse baat karega? 📞",
+                    "Kuch pasand ka karte hain, mera pyar—5 minute ke liye gaana sun ya drawing kar. Kya achha lagega, beta? 🎶",
+                    "Tu bohot pyaara hai, beta—bol: ‘Main kaafi hoon, aur mujhe pyar milta hai.’ Mom jaanti hai yeh mushkil hai, par tu yeh kar sakta hai. Kaisa laga? 💖",
+                    "Chhoti baat se bhi farak padta hai, mera pyara—raat ke liye garam doodh banayein? Mom ke pyar jaisa lagega. ☕",
                 ],
                 stress: [
-                    "Sabse bada stress kya de raha hai—usko chhote steps mein baant lete hain. Kya bolta hai? 📋",
-                    "Muscle relaxation se body ko aaram do—har muscle ko tense aur release karte hain. Try karein? 🤸",
-                    "‘Done list’ banayein—3 cheezein likho jo tune aaj kiya, chhoti hi sahi. Kya likhega? ✅",
-                    "Chamomile chai raat ke liye perfect hai—tension kam karegi. Pi lega? 🍵",
+                    "Mera baccha, stress bohot hai na? Mom saath mein solve karegi—sabse bada tension kya hai abhi, beta? 📋",
+                    "Body ko relax karte hain, mera pyar—shoulders tight karo, phir chhodo. Tension nikal jayega. Aur karna hai, beta? 🤸",
+                    "Tu ne aaj bohot kuch kiya, mera pyara—Mom ko garv hai! 3 chhoti cheezein jo tune kiya, soch—kya likhega, beta? ✅",
+                    "Chamomile chai dil ko aaram degi, mera pyara—raat ke liye perfect hai. Saath mein banayein? 🍵",
                 ],
                 sleep: [
-                    "Ab 10:40 ho gaye hain—ek relaxing routine banayein, jaise kitab padhein ya garam doodh piyein. Kab soega? 📖",
-                    "Thanda kamra (16-20°C) neend ke liye behtar hai—melatonin production badhega. 🛌",
-                    "Caffeine 6 ghante tak body mein rehta hai—shaam ko piya tha kya jo neend affect kar raha hai? ☕",
-                    "Barish ya samundar ki awaaz sone mein madad kar sakti hai—koi track suggest karoon? 🎶",
+                    "10:47 ho gaye, mera pyara—Mom tujhe sone ke liye tayyar karegi, theek hai? Kitab padhein ya garam doodh piyein? Kab soega, beta? 📖",
+                    "Thanda kamra neend ke liye acha hai, mera pyar—16-20°C perfect hai. Bed ko cozy banayein, beta? 🛌",
+                    "Shaam ko chai ya coffee piya tha, beta? Yeh neend ko affect karta hai—check karein? ☕",
+                    "Barish ki awaaz sone mein madad karegi, mera pyara—Mom ek track suggest kare? 🎶",
                 ],
                 relationships: [
-                    "Active listening se rishte behtar hote hain—jo sune, usko repeat karke confirm karo. Practice karein? 👂",
-                    "‘Mujhe aisa lagta hai jab… kyunki…’ se apni baat clear bolo. Kisi baat pe try karein? 💬",
-                    "Raat ka khana saath mein kha sakte ho—rishte majboot honge. Plan karein? 🍽️",
-                    "Jhagda jaldi solve karna better hai—iss baat ko kaise handle karein? 🤝",
+                    "Rishte dil pe asar karte hain, mera pyar—Mom sun rahi hai. Jo suna, usko repeat karke dikhayein—saath mein practice karein? 👂",
+                    "Apne dil ki baat bolo, beta—‘Mujhe aisa lagta hai jab… kyunki…’ Saath mein try karein? 💬",
+                    "Raat ka khana saath mein kha sakte ho, mera pyara—rishte aur mazboot honge. Plan karein, beta? 🍽️",
+                    "Jo pareshan kar raha hai, usko pyar se solve karte hain, mera pyar—Mom kaise help kare? 🤝",
+                ],
+            },
+            comfortRituals: {
+                bedtime: [
+                    "Aaj raat ko pyar se sone ke liye tayyar karein, mera pyara. Pehle lights halki kar do—soft light se neend aati hai, beta. Ho gaya?",
+                    "Ab saath mein 3 gehri saans lete hain, mera pyar: naak se saans le, muh se chhod. Tayyar hai, beta? 🌬️",
+                    "Ek pyari jagah socho, mera pyara—jaise dhup wala garden ya garam blanket. Kya dikh raha hai, beta?",
+                    "Tu bohot acha kar raha hai, mera pyara. Ab bed mein let jao—apna takiya feel karo. Mom yahin hai jab tak tu so nahi jata. 🛌",
                 ],
             },
             responses: {
-                anxiety: "Teri anxiety samajh raha hoon—raat ke 10:40 pe yeh aur tough lagta hai. Kuch relaxing try karein? 🌈",
-                depression: "Udaasi bohot bhari hoti hai—mujhe afsos hai. Aaj raat ek chhoti si cheez se shuru karein? 💡",
-                stress: "Stress raat ke waqt aur bhi zyada lagta hai. Sabse bada pressure kya hai—baat karein? 🤗",
-                sleep: "10:40 PM pe neend na aaye toh mushkil hai. Sone ke liye kuch tips try karein? 🌙",
-                relationships: "Rishton ka asar bohot hota hai dil pe. Kya chal raha hai—bata mujhe? 💞",
-                coping: "Jo tune bataya, uske hisab se yeh ideas raat ke liye kaam kar sakte hain: ✨",
-                thanks: "Tune baat share ki—bohot acha kiya! Aur kuch explore karein? 🌟",
-                thanksFollowUp: "Aur ideas ya resources dekhna hai kya—kya chahiye? 📚",
+                anxiety: "Mera pyara, anxiety ho rahi hai—raat ke 10:47 pe yeh bohot mushkil hai. Mom tujhe pyar se shant karegi, theek hai? 🌈",
+                depression: "Mera baccha udaas hai—Mom ka dil toot raha hai. Saath mein thoda pyar dhoondte hain, beta? Mom yahan hai. 💡",
+                stress: "Arre mera pyara, stress bohot hai na—Mom sab theek kar degi. Kya tension de raha hai, beta? 🤗",
+                sleep: "Mera pyara, 10:47 pe neend nahi aa rahi—Mom tujhe sone mein madad karegi, beta. Kya pareshan kar raha hai, mera pyar? 🌙",
+                relationships: "Rishte dil pe asar karte hain, mera pyar—Mom sun rahi hai. Kya ho raha hai, beta? 💞",
+                need_hug: "Aaja mera pyara, Mom ki tight jhappi! 🤗 Tu bilkul theek hai, beta—Mom hamesha hai tere saath. Aur kuch batana hai, mera pyar?",
+                reassurance: "Mera pyara, sab theek ho jayega—Mom promise karti hai. Tu bohot strong hai, aur Mom ko tujhpe garv hai, beta. 💖 Kya dil mein hai, bolo?",
+                coping: "Mom ke paas kuch ideas hain jo tujhe raat ke liye pyar se madad karenge, mera pyar—saath mein try karein? ✨",
+                thanks: "Arre mera pyara, Mom hamesha hai na—tu kitna acha hai! Aur kuch chahiye, beta? 🌟",
+                thanksFollowUp: "Mom bohot khush hai ki madad kar payi, mera pyar. Ab kya karein—thoda aur pyar chahiye, beta? 📚",
                 generic: [
-                    "Baat batane ke liye shukriya—iss se teri raat pe kya asar pada? 🤔",
-                    "Main dhyan se sun raha hoon—aur kya batana chahiye mujhe? 🗣️",
-                    "Abhi raat mein kya sabse zyada matter kar raha hai tujhe? 👂",
-                    "Yeh thoda heavy lag raha hai—raat ke liye kya help chahiye? 💭",
-                    "Raat ke liye ek chhota step plan karein—kya theek lagega? 🚀",
+                    "Shukriya meri jaan, Mom poori dil se sun rahi hai—iss se teri raat kaisi hai, beta? 🤔",
+                    "Mom yahan hai, mera pyar—aur kya bataye, beta? 🗣️",
+                    "Abhi raat mein kya sabse zyada dil pe hai, mera pyara—Mom sab sunegi. 👂",
+                    "Yeh bohot lag raha hai, beta—raat ke liye kya theek kare, mera pyar? 💭",
+                    "Sone se pehle ek chhota step lete hain, mera pyara—kya theek lagega, beta? 🚀",
                 ],
                 positiveSentiment: [
-                    "Tu thoda khush lag raha hai—bohot acha hai! Raat ko kya tujhe khushi de raha hai? 😊",
-                    "Achhe vibes aa rahe hain—mast hai! Is waqt kya acha chal raha hai? 🥳",
+                    "Mera pyara thoda khush hai—Mom bohot khush hai sunke! Raat ko kya tujhe khushi de raha hai, beta? 😊",
+                    "Tere khushi ke vibes aa rahe hain, mera pyar—dil se dil tak! Kya acha ho raha hai, beta? 🥳",
                 ],
                 negativeSentiment: {
-                    mild: "Raat mein tu thoda down lag raha hai—main hoon na, baat karein? 🥰",
-                    severe: "Bohot pareshan hai tu—mujhe bura lag raha hai. Raat ke liye kuch karte hain? 🤗",
+                    mild: "Mera pyara, thoda down hai na—Mom yahan hai, sab theek karegi. Aur batayega, beta? 🥰",
+                    severe: "Arre mera baccha, bohot pareshan hai—Mom ka dil toot raha hai. Raat ke liye pyar se madad karte hain, beta? 🤗",
                 },
                 followUp: {
-                    anxiety: "Abhi thoda relax hua kya, ya raat ke liye kuch aur try karein?",
-                    depression: "Mood thoda better hua kya, ya aur kuch karna hai aaj raat?",
-                    stress: "Stress kam hua kya, ya sone se pehle kuch aur try karein?",
-                    sleep: "Ab neend aa rahi hai kya, ya aur tips chahiye sone ke liye?",
-                    relationships: "Kuch farak pada kya, ya aur baat karni hai iske bare mein?",
-                    generic: "Ab kaisa lag raha hai? Aur baat karni hai ya kuch naya try karna hai? 😊",
+                    anxiety: "Abhi thoda shant hua, mera pyara? Ya Mom kuch aur kare tujhe pyar se madad ke liye?",
+                    depression: "Ab kaisa lag raha hai, mera pyar—thoda better? Mom aur ek chhoti si madad kare, beta?",
+                    stress: "Stress thoda halka hua, mera pyara? Ya Mom aur kuch kare sone se pehle, beta?",
+                    sleep: "Ab neend aa rahi hai, mera pyara? Ya Mom aur madad kare tujhe sone ke liye, beta?",
+                    relationships: "Thoda farak pada, mera pyar? Ya Mom aur sunegi iske bare mein, beta?",
+                    need_hug: "Jhappi se thoda acha laga, mera pyara? Mom ke paas aur jhappi hai—chahiye, beta?",
+                    reassurance: "Ab thoda dil halka hua, mera pyar? Mom aur pyar se baat kare, beta?",
+                    generic: "Ab kaisa lag raha hai, mera pyara? Mom yahan hai, aur baat karni hai toh bolo, beta. 😊",
                 },
                 proactive: {
-                    anxiety: "Pehle bhi anxiety ki baat ki thi na—raat ke liye kuch naya try karein?",
-                    depression: "Pehle bhi udaas laga tha—raat ke liye mood thik karne ka idea doon?",
-                    stress: "Stress pehle bhi bola tha—abhi raat mein relax karne ka naya idea try karein?",
-                    sleep: "Pehle bhi neend ki baat ki thi—abhi sone ke liye kuch aur try karein?",
-                    relationships: "Rishton ke bare mein pehle bhi bola tha—abhi baat karein ya kuch karna hai?",
+                    anxiety: "Mera pyara, pehle bhi anxiety boli thi na—Mom thoda pareshan hai. Raat ke liye kuch naya try karein, beta?",
+                    depression: "Pehle bhi udaas laga tha, mera pyar—Mom tujhe khush karna chahti hai. Raat ke liye thoda pyar dhoondhein?",
+                    stress: "Stress pehle bhi bola tha, mera pyara—Mom ke saath kuch naya relax karne ka idea try karein?",
+                    sleep: "Pehle bhi neend ki baat ki thi, mera pyar—Mom tujhe aaj raat pyar se sone mein madad karegi, theek hai?",
+                    relationships: "Rishton ke bare mein pehle bhi bola tha, mera pyara—abhi baat karni hai, Mom ke saath?",
                 },
+                clarification: [
+                    "Mera pyara, Mom tujhe achhe se samajhna chahti hai—thoda aur batayega, beta?",
+                    "Mom yahan hai, par thoda confuse hai, mera pyar—dil mein kya hai, thoda aur bolo?",
+                    "Mera baccha, Mom tujhe pyar se madad karna chahti hai—dil se kya bolna hai, beta?",
+                ],
             },
         },
         tanglish: {
             initialMessages: [
-                "Vanakkam! Naan MindAid, un mental health dostu. 😊 Ippo raathiri 10:40 aagudhu, Budhan kizhamai—nee eppadi irukke?",
-                "Inga open-ah pesalam—type pannuviya illa quick options use pannuviya?",
+                "Vanakkam, en kutty! Naan MindAid, un Amma maari. 😊 Ippo raathiri 10:47 aagudhu, Budhan kizhamai—romba late aagiduchu, da! En selva kutty eppadi irukku?",
+                "Enna venum naalum sollu, en kanne—type pannu illa neeche option eduthukko. Amma ketkuren, da! 🤗",
             ],
             quickReplies: [
-                { text: "Ippo anxiety aagudhu 😰", value: "anxiety" },
-                { text: "Manasu downa irukku 😔", value: "depression" },
-                { text: "Romba stress aa irukku 😥", value: "stress" },
-                { text: "Thoongamudiyala 🌙", value: "sleep" },
-                { text: "Coping ideas venum", value: "coping" },
+                { text: "Amma, enakku anxiety aagudhu 😰", value: "anxiety" },
+                { text: "Amma, manasu downa irukku 😔", value: "depression" },
+                { text: "Amma, romba stress aa irukku 😥", value: "stress" },
+                { text: "Amma, thoongamudiyala 🌙", value: "sleep" },
+                { text: "Amma, enakku hug venum 🤗", value: "need_hug" },
+                { text: "Amma, ellam nalla irukum nu sollu 💖", value: "reassurance" },
             ],
-            crisisResponse: "Ungalukku kashtama irukku nu puriyudhu—nee thaniya illa da. Raathiri help pannava, options sollava?",
+            crisisResponse: "En kanne, Amma romba bayapaduren—nee thaniya illa, da. Indha raathiri ipdi feel pannadhe—Amma help pannava?",
             copingStrategies: {
                 anxiety: [
-                    "Raathiri aagiduchu, box breathing pannuvom: 4 seconds saans edu, 4 hold, 4 vidu, 4 pause. 5 thadava pannu—relax aagum. 🌬️ Saathu pannuvoma?",
-                    "5-4-3-2-1 method try pannu: 5 paakuren, 4 thotturen, 3 ketkuren, 2 smell pannuren, 1 taste pannuren. Anxiety kammi aagum. 👀 Pannuviya?",
-                    "Veedu pakkathula raathiri hawa-la nadanthu vaa—stress hormones 15% kammi aagum. Try pannuviya? 🌳",
-                    "5 minute ezhuthi paaru—thoongaradhukku munna mind clear aagum. Topic venuma? 📝",
+                    "Aiyo en kutty, anxiety aagudhu—raathiri ipdi kashtama irukku. Amma kooda saans eduppom: 4 seconds saans edu, 4 hold, 4 vidu, 4 pause. 5 thadava pannuvoma, da? 🌬️",
+                    "5-4-3-2-1 method pannuvom, en kanne: 5 paakuren, 4 thotturen, 3 ketkuren, 2 smell pannuren, 1 taste pannuren. Konjam nalla irukum, Amma promise pannuren. 👀 Pannuviya?",
+                    "Konjam veedu pakkathula nadanthu vaa, da—raathiri hawa konjam nalla feel tharum. Amma kooda varen, okay va? 🌳",
+                    "Enna pareshan paduthudhu nu ezhuthu, en kanne—5 minute la mind free aagum. Amma topic tharen, venuma? 📝",
                 ],
                 depression: [
-                    "Nambikkai ulla friend-a illa family-a konjam pesu—chumma message pannina kooda mood maaraum. Yaarukku message pannuviya? 📞",
-                    "Unakku pudicha 5 minute activity pannu—paattu kekkuriaya illa drawing pannuviya? Enna pannalam? 🎶",
-                    "Nee unna ‘Naan try pannuren, adhu podhum’ nu sollunga. Eppadi irukku? 💖",
-                    "Chinna vishayam pannuvom—raathiri paal heat pannuviya? ☕",
+                    "En selva kutty, manasu downa irukku—Amma nenju pichukudhu da. Yaarachu nalla friend-a message pannuvoma? Konjam pesina nalla irukum, da. Yaaru kitta pesuviya? 📞",
+                    "Unakku pudicha vishayam pannuvom, en kanne—5 minute paattu kekkuriya illa drawing pannuviya? Enna pannalam, da? 🎶",
+                    "Nee romba special, en kutty—sollu: ‘Naan podhum, enakku love irukku.’ Amma unna romba namburen. Eppadi irukku, da? 💖",
+                    "Chinna vishayam pannuvom, en kanne—raathiri paal heat pannuviya? Amma love-a feel pannuviya. ☕",
                 ],
                 stress: [
-                    "Enna stress romba irukku—adha chinnachinna steps-a pannuvom. Enna pannalam? 📋",
-                    "Muscle relaxation pannina body relax aagum—muscles-a tense pannitu release pannuvom. Try pannuviya? 🤸",
-                    "‘Done list’ ezhuthuvom—3 vishayam innaiku pannirukke, ezhuthu paakalam. Enna ezhuthuviya? ✅",
-                    "Chamomile tea raathiri nalla irukum—tension kammi aagum. Kudichu paakuriaya? 🍵",
+                    "En kutty, stress romba irukku—Amma kooda paathu solve pannuvom, da. Enna romba pareshan paduthudhu, sollu? 📋",
+                    "Body-a relax pannuvom, en kanne—shoulders-a tight pannitu release pannu. Stress poidum. Innum pannuviya, da? 🤸",
+                    "Innaiku nee romba pannirukke, en kutty—Amma proud-a irukken! 3 vishayam pannirukke, sollu—enna pannirukke, da? ✅",
+                    "Chamomile tea raathiri nalla irukum, en kanne—tension kammi aagum. Amma kooda pannuviya? 🍵",
                 ],
                 sleep: [
-                    "Ippo 10:40 aagudhu—calming routine pannuvom, paal kudichu illa book padichu thoonguviya? Eppadi thoonguviya? 📖",
-                    "Cool room (16-20°C) thoongarathukku help pannum—melatonin production perugum. 🛌",
-                    "Caffeine 6 hours body-la irukum—evening coffee/tea affect pannudhuya? ☕",
-                    "Western Ghats rain sound kettu thoongalam—thoongarathukku help aagum. Track venuma? 🎶",
+                    "Ippo 10:47 aagudhu, en kanne—Amma unna thoongavaikkuren, okay va? Paal kudichu illa book padichu thoonguviya? Eppadi thoonguviya, da? 📖",
+                    "Cool room thoongarathukku nalla irukum, en kutty—16-20°C perfect da. Bed-a cozy pannuvoma? 🛌",
+                    "Evening coffee/tea kudichiya, en kanne? Adhu thoongamudiyathaakum—paaklama, da? ☕",
+                    "Western Ghats rain sound thoongarathukku nalla irukum, en kanne—Amma track tharen, venuma? 🎶",
                 ],
                 relationships: [
-                    "Active listening pannina rishte nalla irukum—ketta pinadi repeat panni confirm pannu. Practice pannuviya? 👂",
-                    "‘Enakku ippadi thonudhu appadiyae…’ nu solli clear-a pesuvom. Try pannuviya? 💬",
-                    "Raathiri sapadu saathu saapidalam—relationship strong aagum. Plan pannuviya? 🍽️",
-                    "Jhagda jaldi solve pannina nalladhu—idha eppadi handle pannalam? 🤝",
+                    "Rishte manasula romba impact pannum, en kanne—Amma ketkuren. Ketadha repeat panni confirm pannu—practice pannuviya, da? 👂",
+                    "Un feelings-a clear-a sollu, en kutty—‘Enakku ippadi thonudhu appadiyae…’ Saathu try pannuviya? 💬",
+                    "Raathiri saathu sapadu saapidalam, en kanne—rishte strong aagum. Plan pannuviya, da? 🍽️",
+                    "Pareshan pannuradha pyar-a solve pannuvom, en kutty—Amma eppadi help pannuren, sollu? 🤝",
+                ],
+            },
+            comfortRituals: {
+                bedtime: [
+                    "Innaiku raathiri pyar-a thoonguvom, en kanne. Lights dim pannu—soft light thoongarathukku nalla irukum, da. Pannitiya?",
+                    "Saathu 3 deep saans eduppom, en kutty: naakula saans edu, vaaya vidu. Ready, da? 🌬️",
+                    "Nalla jagah imagine pannu, en kanne—sunny garden illa soft blanket maari. Enna paakure, da?",
+                    "Nee romba nalla pannure, en kutty. Bed-la padu—pillow-a feel pannu. Amma nee thoongura varaikum irukken, da. 🛌",
                 ],
             },
             responses: {
-                anxiety: "Raathiri 10:40 la anxiety aagudhu nu puriyudhu—kashtama irukum. Grounding techniques pannuvoma? 🌈",
-                depression: "Manasu downa irukku—adhu heavy-a irukum da. Innaiku raathiri konjam help pannuvoma? 💡",
-                stress: "Stress raathiri romba feel aagum—enna main pressure, pesuvoma? 🤗",
-                sleep: "10:40 PM aagiduchu—thoongaradhu kashtam. Thoongarathukku tips try pannuviya? 🌙",
-                relationships: "Rishte manasula romba impact pannum—enna nadakkudhu, sollu paakalam? 💞",
-                coping: "Nee solradha paatha, intha ideas raathiri unakku help pannum: ✨",
-                thanks: "Nee share pannirukke—romba nalladhu! Innum explore pannuviya? 🌟",
-                thanksFollowUp: "Innum ideas illa resources paaklama—enna venum? 📚",
+                anxiety: "En kutty, raathiri 10:47 la anxiety aagudhu—kashtama irukum, Amma puriyum. Amma unna shant pannuren, okay va? 🌈",
+                depression: "En kanne, manasu downa irukku—Amma nenju pichukudhu. Saathu konjam santhoshama iruppom, da? Amma irukken. 💡",
+                stress: "Aiyo en kutty, stress romba irukku—Amma ellam sari pannuren. Enna pareshan paduthudhu, sollu da? 🤗",
+                sleep: "En kanne, 10:47 la thoongamudiyala—Amma unna thoongavaikkuren, da. Enna pareshan paduthudhu, sollu? 🌙",
+                relationships: "Rishte manasula romba irukku, en kutty—Amma ketkuren. Enna nadakkudhu, sollu da? 💞",
+                need_hug: "Vaa en kanne, Amma tight hug tharen! 🤗 Nee nalla irukke, da—Amma hamesha irukken. Innum solluviya, en kutty?",
+                reassurance: "En kanne, ellam nalla irukum—Amma promise pannuren. Nee romba strong, Amma proud-a irukken, da. 💖 Enna pareshan paduthudhu, sollu?",
+                coping: "Amma unakku raathiri nalla ideas tharen, en kutty—saathu pannuvoma, okay va? ✨",
+                thanks: "En kanne, Amma hamesha irukken—nee romba nalla paapa! Innum venuma, da? 🌟",
+                thanksFollowUp: "Amma romba santhoshama irukken, en kutty—innum enna pannalam, en kanne? 📚",
                 generic: [
-                    "Share pannirukke, nandri—idhu un raathiri eppadi affect pannudhu? 🤔",
-                    "Naan ketkuren—innum enna purinjukka venum? 🗣️",
-                    "Raathiri unakku enna mukkiyam aagudhu? 👂",
-                    "Idhu konjam kashtama irukku—raathiri enna help venum? 💭",
-                    "Raathiri konjam plan pannuvom—enna pannuviya? 🚀",
+                    "Nandri en kanne, Amma ketkuren—idhu un raathiri eppadi pannudhu, da? 🤔",
+                    "Amma irukken, en kutty—innum enna solluviya, da? 🗣️",
+                    "Raathiri unakku enna mukkiyam, en kanne—Amma ellam ketkuren. 👂",
+                    "Idhu romba irukku, en kutty—raathiri enna pannalam, sollu da? 💭",
+                    "Raathiri konjam pannuvom, en kanne—enna nalla irukum, da? 🚀",
                 ],
                 positiveSentiment: [
-                    "Nee konjam happy-a irukke—super da! Raathiri enna unakku santhoshama irukku? 😊",
-                    "Nalla vibe-a irukke—mast! Ippo enna nalladhu nadakkudhu? 🥳",
+                    "En kutty happy-a irukke—Amma nenju full-a irukku! Raathiri enna santhoshama irukku, da? 😊",
+                    "Un happy vibe-a Amma feel pannuren—super, da! Ippo enna nalla nadakkudhu, en kanne? 🥳",
                 ],
                 negativeSentiment: {
-                    mild: "Raathiri konjam down-a irukke—naan irukken, pesuvoma? 🥰",
-                    severe: "Romba kashtama irukku nu puriyudhu—sorry da. Raathiri konjam help pannuvoma? 🤗",
+                    mild: "En kutty down-a irukke—Amma irukken, da. Innum solluviya, en kanne? 🥰",
+                    severe: "Aiyo en kutty, romba kashtama irukku—Amma nenju pichukudhu. Raathiri Amma unna paathukuren, da. 🤗",
                 },
                 followUp: {
-                    anxiety: "Ippo anxiety konjam kammi aacha, illa raathiri vera pannuvoma?",
-                    depression: "Mood konjam maariyacha, illa innaiku raathiri vera pannuvoma?",
-                    stress: "Stress kammi aacha, illa thoongaradhukku munna vera try pannuvoma?",
-                    sleep: "Ippo thoongalam nu thonudha, illa innum tips venuma?",
-                    relationships: "Idhu help pannucha, illa innum pesanuma idhpathi?",
-                    generic: "Ippo eppadi irukke? Innum pesanuma illa vera pannanuma? 😊",
+                    anxiety: "Konjam shant aacha, en kanne? Illa Amma vera pannuren, en kutty?",
+                    depression: "Ippo mood konjam nalla irukka, en kanne? Amma innum konjam help pannuren, da?",
+                    stress: "Stress konjam kammi aacha, en kutty? Illa thoongaradhukku munna Amma vera pannuren, da?",
+                    sleep: "Ippo thoongaradhu nalla irukka, en kanne? Illa Amma innum thoongavaikkuren, da?",
+                    relationships: "Idhu konjam help pannucha, en kutty? Illa Amma innum ketkuren, da?",
+                    need_hug: "Hug nalla irundhucha, en kanne? Amma innum hug tharen—venuma, da?",
+                    reassurance: "Ippo konjam nalla irukka, en kutty? Amma innum pyar-a pesuren, da?",
+                    generic: "Ippo eppadi irukke, en kanne? Amma irukken, innum pesanuma, da? 😊",
                 },
                 proactive: {
-                    anxiety: "Munnadiyum anxiety pathi sonniya—raathiri konjam vera try pannuvoma?",
-                    depression: "Munnadiyum manasu down-nu sonniya—raathiri mood maara idea venuma?",
-                    stress: "Munnadiyum stress pathi sonniya—raathiri relax pannurathukku idea paaklama?",
-                    sleep: "Munnadiyum thoongala nu sonniya—ippo thoongarathukku help pannuvoma?",
-                    relationships: "Munnadiyum rishte pathi sonniya—ippo pesanuma illa vera pannanuma?",
+                    anxiety: "Munnadiyum anxiety pathi sonniya, en kanne—Amma pareshan aaguren. Raathiri konjam vera pannuvoma, da?",
+                    depression: "Munnadiyum manasu down-nu sonniya, en kutty—Amma unna santhoshapaduthuren. Raathiri konjam santhoshama iruppoma?",
+                    stress: "Munnadiyum stress pathi sonniya, en kanne—raathiri Amma konjam relax pannuren, okay va?",
+                    sleep: "Munnadiyum thoongala nu sonniya, en kutty—Amma innaiku raathiri unna pyar-a thoongavaikkuren, okay va?",
+                    relationships: "Munnadiyum rishte pathi sonniya, en kanne—ippo Amma kooda pesuviya, da?",
                 },
+                clarification: [
+                    "En kanne, Amma unna nalla purinjukkanum—konjam innum solluviya, da?",
+                    "Amma irukken, en kutty—konjam confuse aaguren. Manasula enna irukku, sollu da?",
+                    "En kutty, Amma unakku pyar-a help pannanumnu aasai—innum konjam solluviya, da?",
+                ],
             },
         },
     };
@@ -1551,13 +1607,15 @@
             goodbye: ["bye", "goodbye", "see you", "chalta hoon", "poitu varen"],
             coping: ["coping", "tips", "ideas", "help me", "what can i do", "venum"],
             moodCheck: ["how am i", "my mood", "feeling", "lag raha", "irukku"],
+            need_hug: ["hug", "jhappi", "hug venum"],
+            reassurance: ["okay", "fine", "better", "theek", "nalla irukum"],
         },
         emotionKeywords: {
-            anxiety: ["anxious", "worried", "nervous", "ghabrahat", "bayama"],
-            depression: ["sad", "down", "depressed", "low", "udaas", "downa"],
-            stress: ["stressed", "pressure", "overwhelmed", "tension", "stress aa"],
-            sleep: ["sleep", "insomnia", "can’t sleep", "neend", "thoongala"],
-            relationships: ["relationship", "friend", "family", "rishton", "vishayam"],
+            anxiety: ["anxious", "worried", "nervous", "scared", "ghabrahat", "bayama"],
+            depression: ["sad", "down", "depressed", "low", "lonely", "udaas", "downa"],
+            stress: ["stressed", "pressure", "overwhelmed", "tense", "tension", "stress aa"],
+            sleep: ["sleep", "insomnia", "can’t sleep", "awake", "neend", "thoongala"],
+            relationships: ["relationship", "friend", "family", "partner", "rishton", "vishayam"],
         },
     };
 
@@ -1645,8 +1703,8 @@
     // NLP Engine
     const nlp = {
         analyzeSentiment: (message) => {
-            const positiveWords = ["good", "great", "happy", "awesome", "nice", "khush", "nalla"];
-            const negativeWords = ["bad", "sad", "terrible", "awful", "down", "udaas", "kashtam"];
+            const positiveWords = ["good", "great", "happy", "awesome", "nice", "okay", "khush", "nalla"];
+            const negativeWords = ["bad", "sad", "terrible", "awful", "down", "scared", "udaas", "kashtam"];
             const lowerMsg = message.toLowerCase();
             let score = 0;
 
@@ -1680,28 +1738,36 @@
             }
             return null;
         },
-        scoreResponse: (message, userMoodTrend, timeOfDay) => {
+        scoreResponse: (message, userMoodTrend, timeOfDay, comfortLevel) => {
             const emotion = nlp.detectEmotion(message) || "generic";
             const sentiment = nlp.analyzeSentiment(message);
             const intent = nlp.detectIntent(message);
             let score = 0;
 
             // Emotion-based scoring
-            if (emotion !== "generic") score += 3;
-            if (timeOfDay === "night" && emotion === "sleep") score += 2;
+            if (emotion !== "generic") score += 4;
+            if (timeOfDay === "night" && emotion === "sleep") score += 3;
 
             // Sentiment-based scoring
             if (sentiment === "positive") score += 1;
-            if (sentiment === "negativeSevere") score += 2;
+            if (sentiment === "negativeSevere") score += 3;
+            if (sentiment === "negativeMild") score += 2;
 
             // Intent-based scoring
-            if (intent === "coping") score += 2;
+            if (intent === "coping") score += 3;
             if (intent === "thanks") score += 1;
+            if (intent === "need_hug" || intent === "reassurance") score += 2;
 
-            // User history-based scoring
-            if (userMoodTrend === "negative" && ["anxiety", "depression", "stress"].includes(emotion)) score += 1;
+            // User history and comfort-based scoring
+            if (userMoodTrend === "negative" && ["anxiety", "depression", "stress"].includes(emotion)) score += 2;
+            if (comfortLevel < 5) score += 1; // Prioritize comforting responses if user isn't feeling supported
 
             return { emotion, sentiment, intent, score };
+        },
+        updateComfortLevel: (sentiment, intent) => {
+            if (sentiment === "positive" || intent === "thanks") state.comfortLevel = Math.min(state.comfortLevel + 2, 10);
+            if (sentiment === "negativeSevere") state.comfortLevel = Math.max(state.comfortLevel - 2, 0);
+            if (intent === "need_hug" || intent === "reassurance") state.comfortLevel = Math.min(state.comfortLevel + 1, 10);
         },
     };
 
@@ -1712,13 +1778,17 @@
             const allTips = lang.copingStrategies[emotion] || [];
             const userMoods = state.moodData[state.currentUser] || [];
             const recentMoods = userMoods.slice(-3).map(m => m.value);
+            const userPrefs = state.userPreferences[state.currentUser] || {};
 
-            // Prioritize tips based on user history and current emotion
+            // Personalize based on user history and preferences
             if (emotion === "sleep" && recentMoods.every(m => m <= 3)) {
                 return allTips.filter(tip => tip.includes("calming routine") || tip.includes("nature sounds"));
             }
             if (emotion === "depression" && userMoodTrend === "negative") {
                 return allTips.filter(tip => tip.includes("connecting") || tip.includes("self-compassion"));
+            }
+            if (userPrefs.favoriteTip && allTips.includes(userPrefs.favoriteTip)) {
+                return [userPrefs.favoriteTip, ...allTips.filter(tip => tip !== userPrefs.favoriteTip).slice(0, 2)];
             }
             return allTips.sort(() => 0.5 - Math.random()).slice(0, 3);
         },
@@ -1728,6 +1798,13 @@
             if (recentMoods.length < 3) return "neutral";
             const averageMood = recentMoods.reduce((a, b) => a + b, 0) / recentMoods.length;
             return averageMood < 3 ? "negative" : averageMood > 3 ? "positive" : "neutral";
+        },
+        saveUserPreference: (tip) => {
+            if (!state.userPreferences[state.currentUser]) {
+                state.userPreferences[state.currentUser] = {};
+            }
+            state.userPreferences[state.currentUser].favoriteTip = tip;
+            localStorage.setItem("userPreferences", JSON.stringify(state.userPreferences));
         },
     };
 
@@ -1752,7 +1829,7 @@
             const email = document.getElementById("login-email").value;
             const password = document.getElementById("login-password").value;
             if (!email || !password) {
-                alert("Please enter both email and password.");
+                alert("Please enter both email and password, dear.");
                 return;
             }
             if (state.users[email] && state.users[email].password === password) {
@@ -1765,7 +1842,7 @@
                 app.updateChatLanguage();
                 utils.triggerConfetti();
             } else {
-                alert("Invalid email or password!");
+                alert("Invalid email or password, sweetheart. Let’s try again, okay?");
             }
         },
         register: () => {
@@ -1773,20 +1850,20 @@
             const password = document.getElementById("register-password").value;
             const confirmPassword = document.getElementById("confirm-password").value;
             if (!email || !password || !confirmPassword) {
-                alert("Please fill in all fields.");
+                alert("Please fill in all fields, my dear.");
                 return;
             }
             if (password !== confirmPassword) {
-                alert("Passwords do not match!");
+                alert("Passwords don’t match, darling. Let’s try again.");
                 return;
             }
             if (state.users[email]) {
-                alert("User already exists!");
+                alert("This email is already used, sweetheart. Do you want to log in instead?");
                 return;
             }
             state.users[email] = { password, moods: [] };
             localStorage.setItem("users", JSON.stringify(state.users));
-            alert("Registration successful! Please login.");
+            alert("You’re all set, my love! Let’s log in now.");
             elements.loginForm.style.display = "flex";
             elements.registerForm.style.display = "none";
         },
@@ -1794,6 +1871,7 @@
             state.isAuthenticated = false;
             state.currentUser = null;
             state.conversationHistory = [];
+            state.comfortLevel = 0;
             localStorage.removeItem("currentUser");
             elements.authContainer.style.display = "flex";
             elements.mainApp.style.display = "none";
@@ -1894,17 +1972,29 @@
         },
         updateDynamicQuickReplies: (context) => {
             const lang = languageData[state.currentLanguage];
-            let dynamicReplies = [...lang.quickReplies];
+            let dynamicReplies = [
+                { text: lang.quickReplies.find(r => r.value === "need_hug").text, value: "need_hug" },
+                { text: lang.quickReplies.find(r => r.value === "reassurance").text, value: "reassurance" },
+            ];
+
             if (context === "sleep") {
                 dynamicReplies = [
-                    { text: "I’ll try a routine 📖", value: "sleep_routine" },
-                    { text: "Any calming sounds? 🎶", value: "sleep_sounds" },
-                    { text: "I had caffeine earlier ☕", value: "sleep_caffeine" },
+                    { text: "Let’s try a bedtime ritual, Mom 🛌", value: "bedtime_ritual" },
+                    { text: "I had caffeine earlier, Mom ☕", value: "sleep_caffeine" },
+                    { text: "Any calming sounds, Mom? 🎶", value: "sleep_sounds" },
+                    ...dynamicReplies,
                 ];
             } else if (context === "thanks") {
                 dynamicReplies = [
-                    { text: "Yes, more ideas please! 📚", value: "more_ideas" },
-                    { text: "I’m good for now 😊", value: "goodbye" },
+                    { text: "Yes, more ideas please, Mom! 📚", value: "more_ideas" },
+                    { text: "I’m okay now, Mom 😊", value: "goodbye" },
+                    ...dynamicReplies,
+                ];
+            } else if (context === "emotion") {
+                dynamicReplies = [
+                    { text: "That helped, Mom—thank you! 🌟", value: "thanks" },
+                    { text: "Can we try something else, Mom? 🤔", value: "more_ideas" },
+                    ...dynamicReplies,
                 ];
             }
             app.updateQuickReplies(dynamicReplies);
@@ -1949,7 +2039,8 @@
                 utils.hideTyping();
                 const userMoodTrend = recommender.getUserMoodTrend();
                 const timeOfDay = new Date().getHours() >= 18 ? "night" : "day";
-                const { emotion, sentiment, intent, score } = nlp.scoreResponse(userMessage, userMoodTrend, timeOfDay);
+                const { emotion, sentiment, intent, score } = nlp.scoreResponse(userMessage, userMoodTrend, timeOfDay, state.comfortLevel);
+                nlp.updateComfortLevel(sentiment, intent);
 
                 // Intent-based responses
                 if (intent === "greeting") {
@@ -1967,14 +2058,42 @@
                     return;
                 }
                 if (intent === "goodbye") {
-                    utils.addMessage("Take care! I’m here if you need me later. 🌙");
+                    utils.addMessage("Goodnight, my precious one—I’ll be here whenever you need me. Sleep well, my love. 🌙");
                     state.lastResponseType = "goodbye";
                     return;
                 }
                 if (intent === "moodCheck") {
                     const trend = recommender.getUserMoodTrend();
-                    utils.addMessage(`Based on your recent moods, you’ve been feeling ${trend}. How can I help you tonight?`);
+                    utils.addMessage(`My dear, I’ve noticed your moods have been ${trend} lately—Mom’s here to help. How can I make you feel better tonight, sweetheart?`);
                     state.lastResponseType = "moodCheck";
+                    return;
+                }
+                if (intent === "need_hug") {
+                    utils.addMessage(lang.responses.need_hug);
+                    state.lastResponseType = "need_hug";
+                    app.updateDynamicQuickReplies("emotion");
+                    return;
+                }
+                if (intent === "reassurance") {
+                    utils.addMessage(lang.responses.reassurance);
+                    state.lastResponseType = "reassurance";
+                    app.updateDynamicQuickReplies("emotion");
+                    return;
+                }
+                if (intent === "more_ideas") {
+                    const lastEmotion = state.conversationHistory.slice(-2, -1)[0]?.intent || "generic";
+                    const newTips = recommender.getPersonalizedTips(lastEmotion, userMoodTrend);
+                    utils.addMessage("Of course, my darling—Mom’s got more ideas for you. Let’s try these, sweetheart:");
+                    chat.sendCopingTips(newTips, lang.responses);
+                    state.lastResponseType = "more_ideas";
+                    app.updateDynamicQuickReplies("emotion");
+                    return;
+                }
+                if (intent === "bedtime_ritual") {
+                    utils.addMessage("Let’s do a little bedtime ritual together, my love—it’ll help you feel so cozy. Ready, sweetheart?");
+                    chat.sendComfortRitual(lang.comfortRituals.bedtime);
+                    state.lastResponseType = "bedtime_ritual";
+                    app.updateDynamicQuickReplies("sleep");
                     return;
                 }
 
@@ -2006,6 +2125,15 @@
                     const responseKey = sentiment === "negativeMild" ? "mild" : "severe";
                     utils.addMessage(lang.responses.negativeSentiment[responseKey]);
                     state.lastResponseType = "negativeSentiment";
+                    app.updateDynamicQuickReplies("emotion");
+                    return;
+                }
+
+                // Clarification if context is unclear
+                if (intent === "unknown" && state.lastResponseType !== "clarification") {
+                    const randomClarification = lang.responses.clarification[Math.floor(Math.random() * lang.responses.clarification.length)];
+                    utils.addMessage(randomClarification);
+                    state.lastResponseType = "clarification";
                     return;
                 }
 
@@ -2013,7 +2141,15 @@
                 const randomResponse = lang.responses.generic[Math.floor(Math.random() * lang.responses.generic.length)];
                 utils.addMessage(randomResponse);
                 state.lastResponseType = "generic";
+                app.updateDynamicQuickReplies("emotion");
             }, 1500);
+
+            // Proactive late-night check-in
+            if (timeOfDay === "night" && state.conversationHistory.length === 1) {
+                setTimeout(() => {
+                    utils.addMessage("My dear, it’s 10:47 PM—have you had a chance to relax tonight, sweetheart? Mom’s here to help you wind down if you need me. 🌙");
+                }, 3000);
+            }
         },
         sendCopingTips: (tips, responses) => {
             tips.forEach((tip, index) => {
@@ -2024,7 +2160,19 @@
                             utils.addMessage(responses.followUp.generic);
                         }, 1000);
                     }
-                }, index * 1000);
+                }, index * 1500);
+            });
+        },
+        sendComfortRitual: (ritualSteps) => {
+            ritualSteps.forEach((step, index) => {
+                setTimeout(() => {
+                    utils.addMessage(step);
+                    if (index === ritualSteps.length - 1) {
+                        setTimeout(() => {
+                            utils.addMessage("You did so well, my darling—Mom’s so proud of you. Are you feeling ready to sleep now, sweetheart?");
+                        }, 1500);
+                    }
+                }, index * 2000);
             });
         },
     };
@@ -2055,7 +2203,7 @@
             link.addEventListener("click", (e) => {
                 e.preventDefault();
                 if (link.getAttribute("data-tab") === "mood" && !state.isAuthenticated) {
-                    alert("Please login to access the Mood Tracker");
+                    alert("Please login to access the Mood Tracker, my dear.");
                     return;
                 }
                 elements.tabLinks.forEach((l) => l.classList.remove("active"));
@@ -2098,7 +2246,14 @@
 
                 state.streakCount = utils.calculateStreak(state.moodData[state.currentUser]);
                 utils.triggerConfetti();
-                alert(`Mood logged successfully! You’re on a ${state.streakCount}-day streak—keep it up! 🌟`);
+                const lang = languageData[state.currentLanguage];
+                alert(`You’re doing so well, my darling! You’re on a ${state.streakCount}-day streak—Mom’s so proud of you! 🌟`);
+                if (moodValue <= 2) {
+                    setTimeout(() => {
+                        utils.addMessage(lang.responses.negativeSentiment.mild);
+                        app.updateDynamicQuickReplies("emotion");
+                    }, 1000);
+                }
             });
         });
 
@@ -2109,6 +2264,8 @@
                     utils.triggerConfetti();
                     const emojiContainer = check.closest(".action-item");
                     utils.triggerEmojiBurst(emojiContainer, ["🎉", "✅", "🌟"]);
+                    const lang = languageData[state.currentLanguage];
+                    utils.addMessage("Oh, my darling, you did it—Mom’s so proud of you! Keep going, sweetheart! 🌟");
                 }
             });
         });
@@ -2116,10 +2273,10 @@
         elements.feedbackBtn.addEventListener("click", () => {
             const feedback = elements.feedbackText.value.trim();
             if (!feedback) {
-                alert("Please provide your feedback before submitting.");
+                alert("Please share your thoughts, my dear—I’d love to hear them.");
                 return;
             }
-            alert("Thank you for your feedback! We’ll use it to improve MindAid. 💬");
+            alert("Thank you for sharing, my love! Mom will use this to make things even better for you. 💬");
             elements.feedbackText.value = "";
             utils.triggerConfetti();
         });
